@@ -1,424 +1,280 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#070707">
+  <meta name="description" content="Corn dogs artesanales en Cabo San Lucas. Hechos al momento desde $80 MXN. C. Salvatierra 39, Lun–Vie 6–11PM.">
   <title>Cabo Krunch — Corn Dogs · Cabo San Lucas</title>
-  <meta name="description" content="Los mejores corn dogs de Cabo San Lucas. Salchicha de res, mozzarella, mitad y mitad. C. Salvatierra 39 · Lun–Vie 6–11PM." />
-  <link rel="stylesheet" href="styles.css" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@300;400;500;700&family=Bangers&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-  <!-- SVG SYMBOLS -->
-  <svg style="display:none" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <symbol id="s-star" viewBox="0 0 16 16">
-        <path d="M8 0 9.6 6.4 16 8 9.6 9.6 8 16 6.4 9.6 0 8 6.4 6.4Z"/>
-      </symbol>
-      <symbol id="s-dog" viewBox="0 0 22 28">
-        <ellipse cx="11" cy="10" rx="7" ry="9"/>
-        <rect x="9.5" y="18" width="3" height="8" rx="1.5"/>
-      </symbol>
-      <symbol id="s-wa" viewBox="0 0 24 24">
-        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
-      </symbol>
-    </defs>
-  </svg>
+<!-- SVG DEFS -->
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <symbol id="s-wa" viewBox="0 0 24 24">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+    </symbol>
+  </defs>
+</svg>
 
-  <!-- RIBBON TOP -->
-  <div class="ribbon-wrap yw" aria-hidden="true">
-    <div class="ribbon" data-speed="26">
-      <svg class="ri star"><use href="#s-star"/></svg><span>CABO KRUNCH</span>
-      <svg class="ri dog"><use href="#s-dog"/></svg><span>CORN DOG</span>
-      <svg class="ri star"><use href="#s-star"/></svg><span>C. SALVATIERRA 39</span>
-      <svg class="ri dog"><use href="#s-dog"/></svg><span>CABO SAN LUCAS</span>
-      <svg class="ri star"><use href="#s-star"/></svg><span>CORN DOGS</span>
-      <svg class="ri dog"><use href="#s-dog"/></svg><span>KRUNCH</span>
+<!-- NAVBAR -->
+<nav id="navbar">
+  <a href="#" class="nav-logo">
+    CABO KRUNCH
+    <span>Corn Dogs · Cabo San Lucas</span>
+  </a>
+  <ul class="nav-center">
+    <li><a href="#menu">Menú</a></li>
+    <li><a href="#craft">El Proceso</a></li>
+    <li><a href="#ubicacion">Ubicación</a></li>
+  </ul>
+  <a href="https://wa.me/5216242409228" class="nav-wa" target="_blank" rel="noopener">
+    <svg class="ico-wa"><use href="#s-wa"/></svg>
+    WhatsApp
+  </a>
+</nav>
+
+
+<!-- HERO -->
+<section class="hero">
+  <video class="hero-video" autoplay muted loop playsinline>
+    <source src="piramideDeBanderillas.mp4" type="video/mp4">
+  </video>
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <span class="hero-over">Cabo San Lucas &nbsp;·&nbsp; B.C.S. &nbsp;·&nbsp; México</span>
+    <h1 class="hero-title">
+      El Corn Dog
+      <em>más bueno</em>
+      del Cabo.
+    </h1>
+    <div class="hero-rule"></div>
+    <p class="hero-sub">Hecho al momento &nbsp;·&nbsp; Lun–Vie &nbsp;·&nbsp; 6–11 PM</p>
+  </div>
+  <div class="hero-scroll">
+    <div class="hero-scroll-line"></div>
+  </div>
+</section>
+
+
+<!-- RIBBON -->
+<div class="ribbon-wrap" aria-hidden="true">
+  <div class="ribbon" data-speed="32">
+    <span class="r-item">Corn Dog<span class="r-dot"></span></span>
+    <span class="r-item">Cabo Krunch<span class="r-dot"></span></span>
+    <span class="r-item">Hecho al Momento<span class="r-dot"></span></span>
+    <span class="r-item">Desde $80<span class="r-dot"></span></span>
+    <span class="r-item">Cabo San Lucas<span class="r-dot"></span></span>
+    <span class="r-item">Artesanal<span class="r-dot"></span></span>
+    <span class="r-item">C. Salvatierra 39<span class="r-dot"></span></span>
+    <span class="r-item">Lun–Vie &nbsp;6–11 PM<span class="r-dot"></span></span>
+  </div>
+</div>
+
+
+<!-- MENÚ -->
+<section class="section section-menu" id="menu">
+
+  <div class="container">
+    <div class="section-header" data-reveal>
+      <span class="eyebrow">Menú</span>
+      <h2 class="section-title">Cuatro maneras<br>de disfrutarlo.</h2>
     </div>
   </div>
 
-  <!-- NAVBAR -->
-  <nav class="navbar" id="navbar">
-    <a href="#" class="logo-link">
-      <span class="logo-text">CABO<em>KRUNCH</em></span>
-    </a>
-    <ul class="nav-links">
-      <li><a href="#menu">Menú</a></li>
-      <li><a href="#ubicacion">Ubicación</a></li>
-    </ul>
-    <!-- ⚠️ Reemplaza # con tu número: https://wa.me/52XXXXXXXXXX -->
-    <a href="#" class="nav-wa" target="_blank" rel="noopener">
-      <svg class="wa-ico"><use href="#s-wa"/></svg>
-      WhatsApp
-    </a>
-  </nav>
+  <div class="menu-grid">
 
-  <!-- HERO -->
-  <header class="hero">
-    <video class="hero-video" autoplay muted loop playsinline>
-      <source src="piramideDeBanderillas.mp4" type="video/mp4">
+    <div class="menu-card" data-reveal>
+      <div class="menu-card-photo">
+        <div class="photo-fallback"></div>
+        <img src="img/banderillaSalchicha.jpg" alt="Salchicha de Res" loading="lazy" onerror="this.style.display='none'">
+      </div>
+      <div class="menu-card-body">
+        <div>
+          <div class="menu-card-name">Salchicha de Res</div>
+          <div class="menu-card-desc">Masa artesanal de pancakes, salchicha Costco, mostaza y salsas al gusto.</div>
+        </div>
+        <div class="menu-card-price">
+          <div class="price-val">$80</div>
+          <span class="price-cur">MXN</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="menu-card" data-reveal data-delay="1">
+      <div class="menu-card-photo">
+        <div class="photo-fallback"></div>
+        <img src="img/banderillaQueso.jpg" alt="Mozzarella" loading="lazy" onerror="this.style.display='none'">
+      </div>
+      <div class="menu-card-body">
+        <div>
+          <div class="menu-card-name">Mozzarella</div>
+          <div class="menu-card-desc">Queso mozzarella derretido envuelto en masa dorada artesanal.</div>
+        </div>
+        <div class="menu-card-price">
+          <div class="price-val">$80</div>
+          <span class="price-cur">MXN</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="menu-card span-2" data-reveal data-delay="2">
+      <div class="menu-card-photo">
+        <div class="photo-fallback"></div>
+        <img src="img/banderillaMitad.png" alt="Mitad y Mitad" loading="lazy" onerror="this.style.display='none'">
+      </div>
+      <div class="menu-card-body">
+        <div>
+          <div class="menu-card-name">Mitad y Mitad</div>
+          <div class="menu-card-desc">Lo mejor de los dos: res y mozzarella en un mismo corn dog. El favorito del stand.</div>
+        </div>
+        <div class="menu-card-price">
+          <div class="price-val">$80</div>
+          <span class="price-cur">MXN</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="papa-strip" data-reveal data-delay="3">
+    <div style="display:flex;align-items:center;gap:24px;flex:1;min-width:0;">
+      <img src="img/conPapa.png" alt="Con Papa" style="width:90px;height:90px;object-fit:cover;border-radius:8px;flex-shrink:0;">
+      <div>
+        <div class="papa-tag">Upgrade disponible en cualquier corn dog</div>
+        <div class="papa-name">+ Con Papa</div>
+        <div class="papa-desc">Agrega papas crunchy. Único en Cabo.</div>
+      </div>
+    </div>
+    <div>
+      <div class="papa-price-val">$85</div>
+      <span class="papa-price-cur">MXN</span>
+    </div>
+  </div>
+
+</section>
+
+
+<!-- CRAFT -->
+<section class="section-craft" id="craft">
+  <div class="craft-media">
+    <video class="craft-video" autoplay muted loop playsinline>
+      <source src="preparandoCornDogMustard.mp4" type="video/mp4">
     </video>
-    <div class="hero-overlay"></div>
-
-    <div class="hero-content">
-      <p class="hero-badge">
-        <svg class="ri star sm y"><use href="#s-star"/></svg>
-        Cabo San Lucas &nbsp;·&nbsp; C. Salvatierra 39
-        <svg class="ri star sm y"><use href="#s-star"/></svg>
-      </p>
-
-      <h1 class="hero-title">
-        <span>EL CORN DOG</span>
-        <span>MÁS <em class="stroke">KRUNCH</em></span>
-        <span>DE CABO</span>
-      </h1>
-
-      <p class="hero-sub">Crujientes por fuera. Jugosos por dentro.<br/>Hechos al momento.</p>
-
-      <div class="hero-ctas">
-        <!-- ⚠️ Actualiza el enlace de WhatsApp -->
-        <a href="#" class="btn-primary" target="_blank" rel="noopener">
-          <svg class="wa-ico"><use href="#s-wa"/></svg>
-          Ordenar por WhatsApp
-        </a>
-        <a href="#menu" class="btn-secondary">Ver Menú →</a>
-      </div>
-    </div>
-
-    <div class="hero-indicator" aria-hidden="true"></div>
-  </header>
-
-  <!-- RIBBON DOBLE -->
-  <div class="ribbon-double" aria-hidden="true">
-    <div class="ribbon-wrap yw">
-      <div class="ribbon" data-speed="13">
-        <span class="pac-wrap">
-          <svg class="r-pac" viewBox="0 0 26 26" fill="currentColor">
-            <path class="pac-body" d="M13,13 L22,7.5 A10,10,0,1,0,22,18.5 Z"/>
-            <circle cx="10" cy="7" r="1.8" fill="#000"/>
-          </svg>
-        </span>
-        <svg class="ri dog chase"><use href="#s-dog"/></svg>
-        <svg class="ri dog chase"><use href="#s-dog"/></svg>
-        <svg class="ri star"><use href="#s-star"/></svg><span>SALCHICHA DE RES</span>
-        <svg class="ri dog chase"><use href="#s-dog"/></svg>
-        <svg class="ri star"><use href="#s-star"/></svg><span>MOZZARELLA</span>
-        <svg class="ri dog chase"><use href="#s-dog"/></svg>
-        <svg class="ri star"><use href="#s-star"/></svg><span>MITAD Y MITAD</span>
-        <svg class="ri dog chase"><use href="#s-dog"/></svg>
-        <svg class="ri star"><use href="#s-star"/></svg><span>CON PAPA</span>
-      </div>
-    </div>
-    <div class="ribbon-wrap dk">
-      <div class="ribbon" data-speed="19">
-        <svg class="ri star y"><use href="#s-star"/></svg><span>$80 MXN</span>
-        <svg class="ri star y"><use href="#s-star"/></svg><span>LUNES A VIERNES</span>
-        <svg class="ri star y"><use href="#s-star"/></svg><span>6PM – 11PM</span>
-        <svg class="ri star y"><use href="#s-star"/></svg><span>CRUJIENTE · FRESCO · KRUNCH</span>
-        <svg class="ri star y"><use href="#s-star"/></svg><span>C. SALVATIERRA 39</span>
-        <svg class="ri star y"><use href="#s-star"/></svg><span>CABO SAN LUCAS</span>
-      </div>
+    <div class="craft-veil"></div>
+  </div>
+  <div class="craft-content">
+    <div data-reveal>
+      <span class="eyebrow craft-eyebrow">Hecho al Momento</span>
+      <h2 class="craft-title">Cada uno,<br>desde cero.</h2>
+      <p class="craft-body">Masa fresca de pancakes, ingredientes seleccionados y el tiempo justo de fritura para una capa dorada perfecta. Ningún corn dog espera.</p>
     </div>
   </div>
+</section>
 
-  <!-- MENÚ -->
-  <section id="menu" class="section-menu">
-    <div class="container">
 
-      <header class="sec-head" data-reveal>
-        <p class="sec-label">Lo que hacemos</p>
-        <h2 class="sec-title">NUESTRO <span class="acc">MENÚ</span></h2>
-        <p class="sec-sub">Empanizados al momento, fritos a la perfección.</p>
-      </header>
+<!-- UBICACIÓN -->
+<section class="section-loc" id="ubicacion">
+  <div class="loc-grid">
 
-      <div class="menu-grid">
+    <div class="loc-info">
+      <span class="eyebrow">Encuéntranos</span>
 
-        <article class="card" data-reveal data-delay="0">
-          <div class="card-top">
-            <span class="card-num">01</span>
-            <span class="card-ico">🌭</span>
-          </div>
-          <h3 class="card-title">Salchicha de Res</h3>
-          <p class="card-desc">Salchicha de res entera envuelta en masa de maíz dorada y crujiente.</p>
-          <footer class="card-foot">
-            <span class="price"><sup>$</sup>80</span>
-            <span class="chip">CORN DOG</span>
-          </footer>
-        </article>
-
-        <article class="card" data-reveal data-delay="1">
-          <div class="card-top">
-            <span class="card-num">02</span>
-            <span class="card-ico">🧀</span>
-          </div>
-          <h3 class="card-title">Queso Mozzarella</h3>
-          <p class="card-desc">Queso mozzarella fundido en el corazón, masa de maíz crujiente por fuera.</p>
-          <footer class="card-foot">
-            <span class="price"><sup>$</sup>80</span>
-            <span class="chip">CORN DOG</span>
-          </footer>
-        </article>
-
-        <article class="card card--featured" data-reveal data-delay="2">
-          <div class="feat-badge">
-            <svg class="ri star sm y"><use href="#s-star"/></svg> FAVORITO
-          </div>
-          <div class="card-top">
-            <span class="card-num">03</span>
-            <span class="card-ico">🤝</span>
-          </div>
-          <h3 class="card-title">Mitad y Mitad</h3>
-          <p class="card-desc">Lo mejor de los dos mundos: salchicha de res y mozzarella en un solo corn dog.</p>
-          <footer class="card-foot">
-            <span class="price"><sup>$</sup>80</span>
-            <span class="chip chip--y">FAVORITO</span>
-          </footer>
-        </article>
-
-        <article class="card card--potato" data-reveal data-delay="3">
-          <div class="card-top">
-            <span class="card-num">+</span>
-            <span class="card-ico">🥔</span>
-          </div>
-          <h3 class="card-title">Con Papa</h3>
-          <p class="card-desc">Cualquier corn dog con nuestra empanizada de cubos de papa crujiente por fuera.</p>
-          <footer class="card-foot">
-            <span class="price"><sup>$</sup>85</span>
-            <span class="chip chip--g">+ PAPA</span>
-          </footer>
-        </article>
-
+      <div class="loc-detail" data-reveal>
+        <div class="loc-detail-label">Dirección</div>
+        <div class="loc-detail-value">C. Salvatierra 39<br>Cabo San Lucas, BCS</div>
+        <div class="loc-detail-sub">México</div>
       </div>
 
-      <p class="menu-note" data-reveal>
-        <svg class="ri star sm y"><use href="#s-star"/></svg>
-        Pregunta por nuestros toppings y salsas disponibles
-        <svg class="ri star sm y"><use href="#s-star"/></svg>
-      </p>
-
-    </div>
-  </section>
-
-  <!-- VIDEO SECCIÓN -->
-  <section class="section-video">
-    <div class="container">
-      <div class="vid-grid">
-
-        <div class="vid-media" data-reveal>
-          <video autoplay muted loop playsinline class="prep-vid">
-            <source src="preparandoCornDogMustard.mp4" type="video/mp4">
-          </video>
-        </div>
-
-        <div class="vid-copy" data-reveal data-delay="1">
-          <p class="sec-label">El proceso</p>
-          <h2 class="sec-title" style="text-align:left">
-            HECHO AL<br/><span class="acc">MOMENTO</span>
-          </h2>
-          <p class="vid-text">Cada corn dog se prepara frente a ti. Masa de maíz fresca, fritura en el momento exacto y los toppings que elijas.</p>
-          <p class="vid-text">Sin atajos. Sin congelados. Solo krunch puro.</p>
-          <!-- ⚠️ Actualiza el enlace de WhatsApp -->
-          <a href="#" class="btn-primary sm" target="_blank" rel="noopener">
-            <svg class="wa-ico"><use href="#s-wa"/></svg>
-            Ordenar ahora
-          </a>
-        </div>
-
+      <div class="loc-detail" data-reveal data-delay="1">
+        <div class="loc-detail-label">Horario</div>
+        <div class="loc-detail-value">Lunes — Viernes<br>6:00 — 11:00 PM</div>
+        <div class="loc-detail-sub">Sábados y domingos cerrado</div>
       </div>
-    </div>
-  </section>
 
-  <!-- RIBBON SEPARADOR -->
-  <div class="ribbon-wrap yw" aria-hidden="true">
-    <div class="ribbon" data-speed="21">
-      <span class="pac-wrap">
-        <svg class="r-pac" viewBox="0 0 26 26" fill="currentColor">
-          <path class="pac-body" d="M13,13 L22,7.5 A10,10,0,1,0,22,18.5 Z"/>
-          <circle cx="10" cy="7" r="1.8" fill="#000"/>
-        </svg>
-      </span>
-      <svg class="ri dog chase"><use href="#s-dog"/></svg>
-      <svg class="ri dog chase"><use href="#s-dog"/></svg>
-      <svg class="ri star"><use href="#s-star"/></svg><span>CABO KRUNCH</span>
-      <svg class="ri dog chase"><use href="#s-dog"/></svg>
-      <svg class="ri star"><use href="#s-star"/></svg><span>CORN DOGS</span>
-      <svg class="ri dog chase"><use href="#s-dog"/></svg>
-      <svg class="ri star"><use href="#s-star"/></svg><span>KRUNCH</span>
-      <svg class="ri dog chase"><use href="#s-dog"/></svg>
+      <div class="loc-detail" data-reveal data-delay="2">
+        <div class="loc-detail-label">Pagos Aceptados</div>
+        <div class="loc-detail-value">Efectivo · Transferencia · Apple Pay</div>
+      </div>
+
+      <div class="loc-detail" data-reveal data-delay="3">
+        <div class="loc-detail-label">Redes Sociales</div>
+        <div class="loc-detail-value">@cabokrunch</div>
+      </div>
+
+      <a href="https://maps.google.com/?q=Calle+Salvatierra+39,+Cabo+San+Lucas,+BCS"
+         target="_blank" rel="noopener" class="loc-map-link" data-reveal data-delay="3">
+        Abrir en Google Maps ↗
+      </a>
     </div>
+
+    <div class="loc-map">
+      <iframe
+        title="Ubicación Cabo Krunch"
+        src="https://maps.google.com/maps?q=Calle+Salvatierra+39,+Cabo+San+Lucas,+Baja+California+Sur,+Mexico&output=embed&hl=es&z=16"
+        allowfullscreen loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade">
+      </iframe>
+    </div>
+
   </div>
+</section>
 
-  <!-- FEATURES -->
-  <section class="section-feats">
-    <div class="container">
-      <div class="feats-grid">
-        <div class="feat" data-reveal data-delay="0">
-          <div class="feat-ico">🔥</div>
-          <h4>Frescos al Momento</h4>
-          <p>Se prepara en el instante que ordenas.</p>
-        </div>
-        <div class="feat" data-reveal data-delay="1">
-          <div class="feat-ico">🌽</div>
-          <h4>Masa de Maíz</h4>
-          <p>Crujiente por fuera, esponjosa por dentro.</p>
-        </div>
-        <div class="feat" data-reveal data-delay="2">
-          <div class="feat-ico">🥔</div>
-          <h4>Papa Diferenciadora</h4>
-          <p>Cubos de papa crujiente. Único en Cabo.</p>
-        </div>
-        <div class="feat" data-reveal data-delay="3">
-          <div class="feat-ico">📍</div>
-          <h4>Centro de Cabo</h4>
-          <p>C. Salvatierra 39, imposible de olvidar.</p>
-        </div>
-      </div>
-    </div>
-  </section>
 
-  <!-- UBICACIÓN -->
-  <section id="ubicacion" class="section-loc">
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-logo">CABO KRUNCH</div>
+  <nav class="footer-nav">
+    <a href="#menu">Menú</a>
+    <a href="#craft">El Proceso</a>
+    <a href="#ubicacion">Ubicación</a>
+  </nav>
+  <div class="footer-copy">© 2026 · Cabo San Lucas, B.C.S.</div>
+</footer>
 
-    <div class="ribbon-wrap yw" aria-hidden="true">
-      <div class="ribbon" data-speed="17">
-        <svg class="ri star"><use href="#s-star"/></svg><span>ENCUÉNTRANOS</span>
-        <svg class="ri dog"><use href="#s-dog"/></svg><span>C. SALVATIERRA 39</span>
-        <svg class="ri star"><use href="#s-star"/></svg><span>CABO SAN LUCAS</span>
-        <svg class="ri dog"><use href="#s-dog"/></svg><span>LUN–VIE 6PM–11PM</span>
-        <svg class="ri star"><use href="#s-star"/></svg><span>KRUNCH</span>
-        <svg class="ri dog"><use href="#s-dog"/></svg><span>CORN DOG</span>
-      </div>
-    </div>
 
-    <div class="container loc-container">
-      <div class="loc-grid">
+<script>
+(function () {
 
-        <div class="loc-info" data-reveal>
-          <p class="sec-label">Visítanos</p>
-          <h2 class="sec-title" style="text-align:left">
-            DÓNDE <span class="acc">ENCONTRARNOS</span>
-          </h2>
-          <ul class="loc-list">
-            <li>
-              <span class="loc-ico">📍</span>
-              <div>
-                <strong>Dirección</strong>
-                <p>C. Salvatierra 39<br/>Cabo San Lucas, BCS, México</p>
-              </div>
-            </li>
-            <li>
-              <span class="loc-ico">🕐</span>
-              <div>
-                <strong>Horario</strong>
-                <p>Lunes a Viernes<br/>6:00 PM – 11:00 PM</p>
-              </div>
-            </li>
-            <li>
-              <span class="loc-ico">📱</span>
-              <div>
-                <strong>Redes Sociales</strong>
-                <p>@cabokrunch</p>
-              </div>
-            </li>
-          </ul>
-          <a href="https://maps.google.com/?q=Calle+Salvatierra+39,+Cabo+San+Lucas,+BCS" target="_blank" rel="noopener" class="btn-outline">
-            Abrir en Google Maps ↗
-          </a>
-        </div>
+  /* 1. Navbar */
+  var nav = document.getElementById('navbar');
+  window.addEventListener('scroll', function () {
+    nav.classList.toggle('scrolled', window.scrollY > 80);
+  }, { passive: true });
 
-        <div class="map-frame" data-reveal data-delay="1">
-          <iframe
-            title="Ubicación Cabo Krunch"
-            src="https://maps.google.com/maps?q=Calle+Salvatierra+39,+Cabo+San+Lucas,+Baja+California+Sur,+Mexico&output=embed&hl=es&z=16"
-            width="100%" height="100%"
-            style="border:0;" allowfullscreen loading="lazy"
-            referrerpolicy="no-referrer-when-downgrade">
-          </iframe>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- FOOTER -->
-  <footer id="contacto" class="footer">
-    <div class="ribbon-wrap yw" aria-hidden="true">
-      <div class="ribbon" data-speed="24">
-        <span class="pac-wrap">
-          <svg class="r-pac" viewBox="0 0 26 26" fill="currentColor">
-            <path class="pac-body" d="M13,13 L22,7.5 A10,10,0,1,0,22,18.5 Z"/>
-            <circle cx="10" cy="7" r="1.8" fill="#000"/>
-          </svg>
-        </span>
-        <svg class="ri dog chase"><use href="#s-dog"/></svg>
-        <svg class="ri star"><use href="#s-star"/></svg><span>CABO KRUNCH</span>
-        <svg class="ri dog chase"><use href="#s-dog"/></svg>
-        <svg class="ri star"><use href="#s-star"/></svg><span>CORN DOGS</span>
-        <svg class="ri dog chase"><use href="#s-dog"/></svg>
-        <svg class="ri star"><use href="#s-star"/></svg><span>KRUNCH</span>
-        <svg class="ri dog chase"><use href="#s-dog"/></svg>
-        <svg class="ri star"><use href="#s-star"/></svg><span>CABO SAN LUCAS</span>
-      </div>
-    </div>
-    <div class="container foot-inner">
-      <div class="foot-brand">
-        <span class="logo-text lg">CABO<em>KRUNCH</em></span>
-        <p>El corn dog más krunch de Cabo San Lucas.</p>
-      </div>
-      <nav class="foot-nav">
-        <a href="#menu">Menú</a>
-        <a href="#ubicacion">Ubicación</a>
-        <a href="#contacto">Contacto</a>
-      </nav>
-    </div>
-    <div class="foot-bottom">
-      © 2026 Cabo Krunch &nbsp;·&nbsp; Cabo San Lucas, BCS &nbsp;·&nbsp; Lun–Vie 6PM–11PM
-    </div>
-  </footer>
-
-  <script>
-  (function () {
-
-    /* Navbar: fondo sólido al hacer scroll */
-    var nav = document.getElementById('navbar');
-    window.addEventListener('scroll', function () {
-      nav.classList.toggle('scrolled', window.scrollY > 60);
-    }, { passive: true });
-
-    /* Scroll reveal */
-    var delays = [0, 120, 240, 360];
-    var obs = new IntersectionObserver(function (entries) {
-      entries.forEach(function (e) {
-        if (!e.isIntersecting) return;
-        var d = e.target.dataset.delay;
-        if (d !== undefined) e.target.style.transitionDelay = delays[+d] + 'ms';
-        e.target.classList.add('revealed');
-        obs.unobserve(e.target);
-      });
-    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
-
-    document.querySelectorAll('[data-reveal]').forEach(function (el) {
-      obs.observe(el);
+  /* 2. Scroll reveal */
+  var delays = [0, 160, 320, 480];
+  var obs = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (!e.isIntersecting) return;
+      var d = e.target.dataset.delay;
+      if (d !== undefined) e.target.style.transitionDelay = (delays[+d] || 0) + 'ms';
+      e.target.classList.add('revealed');
+      obs.unobserve(e.target);
     });
+  }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+  document.querySelectorAll('[data-reveal]').forEach(function (el) { obs.observe(el); });
 
-    /* Ribbon auto-fill */
-    document.fonts.ready.then(function () {
-      document.querySelectorAll('.ribbon').forEach(function (r) {
-        var setW = r.scrollWidth;
-        var need = Math.max(window.screen.width, window.innerWidth) * 5;
-        var html = r.innerHTML;
-        while (r.scrollWidth < need) r.insertAdjacentHTML('beforeend', html);
-        r.style.setProperty('--sw', setW + 'px');
-        r.style.setProperty('--dur', (parseFloat(r.dataset.speed) || 20) + 's');
-        r.classList.add('go');
-      });
+  /* 3. Ribbon */
+  document.fonts.ready.then(function () {
+    document.querySelectorAll('.ribbon').forEach(function (r) {
+      var setW = r.scrollWidth;
+      var need = Math.max(window.screen.width, window.innerWidth) * 5;
+      var html  = r.innerHTML;
+      while (r.scrollWidth < need) r.insertAdjacentHTML('beforeend', html);
+      r.style.setProperty('--sw',  setW + 'px');
+      r.style.setProperty('--dur', (parseFloat(r.dataset.speed) || 30) + 's');
+      r.classList.add('go');
     });
+  });
 
-  }());
-  </script>
+}());
+</script>
 
 </body>
 </html>
