@@ -604,9 +604,131 @@
     }
     .modal-btn.cancel  { background: var(--raised); color: var(--muted); border: 1px solid var(--border); }
     .modal-btn.confirm { background: var(--gold); color: #000; }
+
+    /* ── PIN GATE ──────────────────────────── */
+    .pin-gate {
+      position: fixed;
+      inset: 0;
+      background: var(--black);
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 24px calc(32px + var(--safe-b));
+      gap: 0;
+    }
+    .pin-gate.hide {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .25s ease;
+    }
+    .pin-logo {
+      font-family: 'Bangers', cursive;
+      font-size: 1.5rem;
+      letter-spacing: 4px;
+      color: var(--gold);
+      margin-bottom: 6px;
+    }
+    .pin-sub {
+      font-size: 0.52rem;
+      font-weight: 500;
+      letter-spacing: 0.38em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 52px;
+    }
+    .pin-dots {
+      display: flex;
+      gap: 18px;
+      margin-bottom: 48px;
+    }
+    .pin-dot {
+      width: 13px; height: 13px;
+      border-radius: 50%;
+      border: 1.5px solid var(--muted);
+      transition: background .15s, border-color .15s;
+    }
+    .pin-dot.filled {
+      background: var(--gold);
+      border-color: var(--gold);
+    }
+    .pin-dots.shake {
+      animation: pinShake .35s ease;
+    }
+    @keyframes pinShake {
+      0%,100% { transform: translateX(0); }
+      20%      { transform: translateX(-8px); }
+      40%      { transform: translateX(8px); }
+      60%      { transform: translateX(-5px); }
+      80%      { transform: translateX(5px); }
+    }
+    .pin-pad {
+      display: grid;
+      grid-template-columns: repeat(3, 72px);
+      gap: 10px;
+    }
+    .pin-key {
+      height: 72px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--cream);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1.35rem;
+      font-weight: 400;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: background .12s, transform .1s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+    }
+    .pin-key:active { background: var(--raised); transform: scale(0.93); }
+    .pin-key.del    { color: var(--muted); font-size: 1rem; }
+    .pin-key.zero   { grid-column: 2; }
+    .pin-error {
+      font-size: 0.6rem;
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      color: var(--red);
+      margin-top: 20px;
+      height: 18px;
+      text-align: center;
+      opacity: 0;
+      transition: opacity .2s;
+    }
+    .pin-error.show { opacity: 1; }
   </style>
 </head>
 <body>
+
+<!-- PIN GATE -->
+<div class="pin-gate" id="pinGate">
+  <div class="pin-logo">KRUNCH</div>
+  <div class="pin-sub">Punto de Venta</div>
+  <div class="pin-dots" id="pinDots">
+    <div class="pin-dot" id="pd0"></div>
+    <div class="pin-dot" id="pd1"></div>
+    <div class="pin-dot" id="pd2"></div>
+    <div class="pin-dot" id="pd3"></div>
+  </div>
+  <div class="pin-pad">
+    <button class="pin-key" data-n="1">1</button>
+    <button class="pin-key" data-n="2">2</button>
+    <button class="pin-key" data-n="3">3</button>
+    <button class="pin-key" data-n="4">4</button>
+    <button class="pin-key" data-n="5">5</button>
+    <button class="pin-key" data-n="6">6</button>
+    <button class="pin-key" data-n="7">7</button>
+    <button class="pin-key" data-n="8">8</button>
+    <button class="pin-key" data-n="9">9</button>
+    <button class="pin-key del" id="pinDel">⌫</button>
+    <button class="pin-key zero" data-n="0">0</button>
+  </div>
+  <div class="pin-error" id="pinError">PIN incorrecto</div>
+</div>
 
 <!-- TOP BAR -->
 <div class="top-bar">
@@ -732,6 +854,52 @@
 <script>
 (function () {
 'use strict';
+
+/* ── PIN GATE ──────────────────────────── */
+var PIN = '9170';
+var pinEntry = '';
+
+function pinUnlock() {
+  var gate = document.getElementById('pinGate');
+  gate.classList.add('hide');
+  setTimeout(function(){ gate.style.display = 'none'; }, 280);
+  sessionStorage.setItem('ck_unlocked', '1');
+}
+
+if (sessionStorage.getItem('ck_unlocked') === '1') {
+  document.getElementById('pinGate').style.display = 'none';
+} else {
+  document.querySelectorAll('.pin-key[data-n]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      if (pinEntry.length >= 4) return;
+      pinEntry += this.dataset.n;
+      document.getElementById('pd' + (pinEntry.length - 1)).classList.add('filled');
+      if (pinEntry.length === 4) {
+        setTimeout(function() {
+          if (pinEntry === PIN) {
+            pinUnlock();
+          } else {
+            var dots = document.getElementById('pinDots');
+            var err  = document.getElementById('pinError');
+            dots.classList.add('shake');
+            err.classList.add('show');
+            setTimeout(function() {
+              dots.classList.remove('shake');
+              err.classList.remove('show');
+              pinEntry = '';
+              for (var i = 0; i < 4; i++) document.getElementById('pd'+i).classList.remove('filled');
+            }, 700);
+          }
+        }, 80);
+      }
+    });
+  });
+  document.getElementById('pinDel').addEventListener('click', function() {
+    if (!pinEntry.length) return;
+    document.getElementById('pd' + (pinEntry.length - 1)).classList.remove('filled');
+    pinEntry = pinEntry.slice(0, -1);
+  });
+}
 
 /* ── DATA ──────────────────────────────── */
 var PRODUCTS = [
