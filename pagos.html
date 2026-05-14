@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#070707">
+  <meta name="format-detection" content="telephone=no, date=no, email=no, address=no">
   <title>Datos de Pago — Cabo Krunch</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -194,6 +195,12 @@
       letter-spacing: 0.28em;
       text-transform: uppercase;
       color: #2a2826;
+    }
+
+    /* iOS auto-link override */
+    .data-val a, .data-val span {
+      color: inherit !important;
+      text-decoration: none !important;
     }
 
     /* TOAST */
