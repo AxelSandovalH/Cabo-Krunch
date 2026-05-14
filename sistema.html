@@ -292,6 +292,8 @@
     }
     .pay-pill .pp-label { color: var(--muted); }
     .pay-pill .pp-amt   { color: var(--cream); font-weight: 700; }
+    .pay-pill.active .pp-label { color: var(--gold); }
+    .pay-pill.active .pp-amt   { color: var(--gold); }
 
     /* breakdown grid */
     .prod-breakdown {
@@ -767,7 +769,7 @@
     <div class="summary-card">
       <div class="summary-top">
         <div>
-          <div class="total-label">Total del día</div>
+          <div class="total-label" id="totalLabel">Total del día</div>
           <div class="total-val" id="todayTotal">$0</div>
           <div class="total-count" id="todayCount">0 ventas</div>
         </div>
@@ -1008,6 +1010,7 @@ document.querySelectorAll('.tab-btn').forEach(function(btn){
     this.classList.add('active');
     document.getElementById('tab-' + id).classList.add('active');
     document.querySelector('.content').scrollTop = 0;
+    if (id === 'venta')     renderTodaySummary();
     if (id === 'historial') renderHistorial();
     if (id === 'stock')     renderStock();
   });
@@ -1034,6 +1037,7 @@ document.querySelectorAll('.pay-btn').forEach(function(btn){
     document.querySelectorAll('.pay-btn').forEach(function(b){ b.classList.remove('selected'); });
     this.classList.add('selected');
     selectedPay = this.dataset.pay;
+    renderTodaySummary();
   });
 });
 
@@ -1094,28 +1098,35 @@ document.getElementById('undoBtn').addEventListener('click', function(){
 
 /* ── TODAY SUMMARY ─────────────────────── */
 function renderTodaySummary() {
-  var today = todayStr();
-  var ds = sales.filter(function(s){ return s.date === today; });
-  var total = ds.reduce(function(a,s){ return a+s.price; },0);
+  var today  = todayStr();
+  var allDs  = sales.filter(function(s){ return s.date === today; });
+  var ds     = allDs.filter(function(s){ return s.payment === selectedPay; });
+  var total  = ds.reduce(function(a,s){ return a + s.price; }, 0);
+  var payObj = PAYMENTS.find(function(p){ return p.id === selectedPay; });
 
+  document.getElementById('totalLabel').textContent = payObj ? payObj.label : 'Total';
   document.getElementById('todayTotal').textContent = '$' + total.toLocaleString('es-MX');
   document.getElementById('todayCount').textContent = ds.length + (ds.length === 1 ? ' venta' : ' ventas');
 
+  /* pay-pills: totales de TODOS los métodos, activo resaltado */
   var payAgg = {};
-  ds.forEach(function(s){ payAgg[s.payment] = (payAgg[s.payment]||0) + s.price; });
+  allDs.forEach(function(s){ payAgg[s.payment] = (payAgg[s.payment]||0) + s.price; });
   var pillsEl = document.getElementById('payPills');
   pillsEl.innerHTML = '';
   PAYMENTS.forEach(function(p){
     if (!payAgg[p.id]) return;
     var pill = document.createElement('div');
-    pill.className = 'pay-pill';
+    pill.className = 'pay-pill' + (p.id === selectedPay ? ' active' : '');
     pill.innerHTML = '<span class="pp-label">' + p.label + '</span><span class="pp-amt">$' + payAgg[p.id].toLocaleString('es-MX') + '</span>';
     pillsEl.appendChild(pill);
   });
 
+  /* desglose por producto filtrado por método seleccionado */
   var prodAgg = {};
-  PRODUCTS.forEach(function(p){ prodAgg[p.id] = { count:0, total:0 }; });
-  ds.forEach(function(s){ if(prodAgg[s.product]){ prodAgg[s.product].count++; prodAgg[s.product].total+=s.price; } });
+  PRODUCTS.forEach(function(p){ prodAgg[p.id] = { count: 0, total: 0 }; });
+  ds.forEach(function(s){
+    if (prodAgg[s.product]) { prodAgg[s.product].count++; prodAgg[s.product].total += s.price; }
+  });
   var bdEl = document.getElementById('prodBreakdown');
   bdEl.innerHTML = '';
   PRODUCTS.forEach(function(p){
@@ -1123,9 +1134,9 @@ function renderTodaySummary() {
     var item = document.createElement('div');
     item.className = 'bd-item';
     item.innerHTML =
-      '<div class="bd-name">' + p.name.replace('\n','<br>') + '</div>' +
+      '<div class="bd-name">'  + p.name.replace('\n','<br>') + '</div>' +
       '<div class="bd-count">' + d.count + '</div>' +
-      '<div class="bd-amt">' + (d.total ? '$'+d.total : '—') + '</div>';
+      '<div class="bd-amt">'   + (d.total ? '$' + d.total : '—') + '</div>';
     bdEl.appendChild(item);
   });
 }
