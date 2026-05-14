@@ -860,15 +860,21 @@
 /* ── PIN GATE ──────────────────────────── */
 var PIN = '9170';
 var pinEntry = '';
+var UNLOCK_TTL = 12 * 60 * 60 * 1000; // 12 horas
+
+function isUnlocked() {
+  var ts = parseInt(localStorage.getItem('ck_unlocked_ts') || '0', 10);
+  return ts && (Date.now() - ts) < UNLOCK_TTL;
+}
 
 function pinUnlock() {
   var gate = document.getElementById('pinGate');
   gate.classList.add('hide');
   setTimeout(function(){ gate.style.display = 'none'; }, 280);
-  sessionStorage.setItem('ck_unlocked', '1');
+  localStorage.setItem('ck_unlocked_ts', Date.now().toString());
 }
 
-if (sessionStorage.getItem('ck_unlocked') === '1') {
+if (isUnlocked()) {
   document.getElementById('pinGate').style.display = 'none';
 } else {
   document.querySelectorAll('.pin-key[data-n]').forEach(function(btn) {
@@ -1269,6 +1275,14 @@ function renderHistorial() {
     list.appendChild(el);
   });
 }
+
+  window.addEventListener('pageshow', function(e) {
+    if (e.persisted) {
+      document.body.style.display = 'none';
+      document.body.offsetHeight;
+      document.body.style.display = '';
+    }
+  });
 
 }());
 </script>
