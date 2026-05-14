@@ -281,6 +281,14 @@
   <div class="toast" id="toast">Copiado</div>
 
   <script>
+    window.addEventListener('pageshow', function(e) {
+      if (e.persisted) {
+        document.body.style.display = 'none';
+        document.body.offsetHeight;
+        document.body.style.display = '';
+      }
+    });
+
     var toastTimer;
     function showToast() {
       var t = document.getElementById('toast');
