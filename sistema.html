@@ -805,6 +805,10 @@
         <span class="recipe-prod">Mitad y Mitad</span>
         <span class="recipe-ing">½ salchicha · 30g queso · 1 chopstick<br>60g harina · ¼ huevo · 60ml leche</span>
       </div>
+      <div class="recipe-row">
+        <span class="recipe-prod">Agua Fresca</span>
+        <span class="recipe-ing">1 pieza · costo $17</span>
+      </div>
     </div>
 
   </div>
@@ -917,6 +921,7 @@ var PRODUCTS = [
   { id: 'mozz_p',  name: 'Mozz\n+ Papa',        price: 85,  base: 'mozz'  },
   { id: 'mitad',   name: 'Mitad\ny Mitad',      price: 80,  base: 'mitad' },
   { id: 'mitad_p', name: 'Mitad\n+ Papa',       price: 85,  base: 'mitad' },
+  { id: 'agua',    name: 'Agua\nFresca',        price: 30,  base: 'agua'  },
 ];
 
 var STOCK_DEF = {
@@ -926,12 +931,14 @@ var STOCK_DEF = {
   harina:     { name: 'Harina Pancakes', unit: 'g',     low: 500, warn: 800 },
   huevo:      { name: 'Huevos',          unit: 'pzas',  low: 4,   warn: 8   },
   leche:      { name: 'Leche',           unit: 'ml',    low: 300, warn: 500 },
+  agua:       { name: 'Agua Fresca',     unit: 'pzas',  low: 3,   warn: 8   },
 };
 
 var RECIPE = {
   res:   { salchicha: 1,   chopsticks: 1, harina: 60, huevo: 0.25, leche: 60 },
   mozz:  { queso: 50,      chopsticks: 1, harina: 60, huevo: 0.25, leche: 60 },
   mitad: { salchicha: 0.5, queso: 30,    chopsticks: 1, harina: 60, huevo: 0.25, leche: 60 },
+  agua:  { agua: 1 },
 };
 
 var PAYMENTS = [
