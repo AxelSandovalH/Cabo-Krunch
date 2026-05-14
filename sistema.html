@@ -1074,8 +1074,9 @@ function registerSale(productId) {
 
 /* ── UNDO ──────────────────────────────── */
 document.getElementById('undoBtn').addEventListener('click', function(){
-  if (!sales.length) return;
-  var last = sales[sales.length - 1];
+  var todaySales = sales.filter(function(s){ return s.date === todayStr(); });
+  if (!todaySales.length) return;
+  var last = todaySales[todaySales.length - 1];
   var prod = PRODUCTS.find(function(p){ return p.id === last.product; });
   var payLabel = PAYMENTS.find(function(p){ return p.id === last.payment; });
   showModal(
@@ -1087,9 +1088,10 @@ document.getElementById('undoBtn').addEventListener('click', function(){
         var recipe = RECIPE[prod.base];
         if (recipe) { for (var ing in recipe) { if (stock[ing] !== undefined) stock[ing] += recipe[ing]; } saveStock(stock); }
       }
-      sales.pop();
+      sales.splice(sales.indexOf(last), 1);
       saveSales(sales);
-      document.getElementById('undoBtn').disabled = !sales.length;
+      var remaining = sales.filter(function(s){ return s.date === todayStr(); });
+      document.getElementById('undoBtn').disabled = !remaining.length;
       renderTodaySummary();
       showToast('Venta eliminada');
     }
@@ -1141,7 +1143,8 @@ function renderTodaySummary() {
   });
 }
 renderTodaySummary();
-if (sales.length) document.getElementById('undoBtn').disabled = false;
+var todayCount = sales.filter(function(s){ return s.date === todayStr(); }).length;
+if (todayCount) document.getElementById('undoBtn').disabled = false;
 
 /* ── STOCK ─────────────────────────────── */
 function renderStock() {
