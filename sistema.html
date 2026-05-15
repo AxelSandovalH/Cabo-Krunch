@@ -853,8 +853,8 @@
   <!-- ═══ VENTA ═══ -->
   <div class="tab-panel active" id="tab-venta">
 
-    <div class="sec-label">Método de pago</div>
-    <div class="pay-row">
+    <div class="sec-label">Filtro de resumen</div>
+    <div class="pay-row" id="mainPayRow">
       <button class="pay-btn selected" data-pay="efectivo">Efectivo</button>
       <button class="pay-btn"          data-pay="transferencia">Transferencia</button>
       <button class="pay-btn"          data-pay="applepay">Apple Pay</button>
@@ -955,6 +955,27 @@
 </main>
 
 <div class="toast" id="toast"></div>
+
+<!-- SALE SHEET -->
+<div class="modal-overlay" id="saleSheet">
+  <div class="modal-sheet">
+    <div style="text-align:center;padding-bottom:18px;border-bottom:1px solid var(--border);margin-bottom:18px">
+      <div style="font-size:0.52rem;font-weight:600;letter-spacing:0.35em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Nueva venta</div>
+      <div style="font-size:1.1rem;font-weight:700;color:var(--cream)" id="ssName"></div>
+      <div style="font-size:2.4rem;font-weight:700;color:var(--gold);letter-spacing:-0.02em;line-height:1.1;margin-top:4px" id="ssPrice"></div>
+    </div>
+    <div style="font-size:0.52rem;font-weight:600;letter-spacing:0.35em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Método de pago</div>
+    <div class="pay-row" id="ssPayRow">
+      <button class="pay-btn" data-pay="efectivo">Efectivo</button>
+      <button class="pay-btn" data-pay="transferencia">Transferencia</button>
+      <button class="pay-btn" data-pay="applepay">Apple Pay</button>
+    </div>
+    <div class="modal-actions" style="flex-direction:column;gap:8px;margin-top:4px">
+      <button class="modal-btn confirm" id="ssConfirm">Confirmar venta</button>
+      <button class="modal-btn cancel"  id="ssCancel"  style="border:none;background:none;font-size:0.78rem">Cancelar</button>
+    </div>
+  </div>
+</div>
 
 <div class="modal-overlay" id="modal">
   <div class="modal-sheet">
@@ -1141,25 +1162,68 @@ document.querySelectorAll('.tab-btn').forEach(function(btn){
     btn.innerHTML =
       '<span class="p-name">' + p.name.replace('\n','<br>') + '</span>' +
       '<span class="p-price">$' + p.price + '</span>';
-    btn.addEventListener('click', function(){ registerSale(p.id); });
+    btn.addEventListener('click', function(){ showSaleSheet(p.id); });
     grid.appendChild(btn);
   });
 }());
 
-/* ── PAYMENT ───────────────────────────── */
-document.querySelectorAll('.pay-btn').forEach(function(btn){
+/* ── PAYMENT FILTER (resumen) ──────────── */
+document.querySelectorAll('#mainPayRow .pay-btn').forEach(function(btn){
   btn.addEventListener('click', function(){
-    document.querySelectorAll('.pay-btn').forEach(function(b){ b.classList.remove('selected'); });
+    document.querySelectorAll('#mainPayRow .pay-btn').forEach(function(b){ b.classList.remove('selected'); });
     this.classList.add('selected');
     selectedPay = this.dataset.pay;
     renderTodaySummary();
   });
 });
 
-/* ── REGISTER SALE ─────────────────────── */
-function registerSale(productId) {
+/* ── SALE SHEET ────────────────────────── */
+var ssProdId = null;
+var ssPay    = 'efectivo';
+
+function showSaleSheet(productId) {
   var prod = PRODUCTS.find(function(p){ return p.id === productId; });
   if (!prod) return;
+  ssProdId = productId;
+  ssPay    = selectedPay;
+  document.getElementById('ssName').textContent  = prod.name.replace('\n', ' ');
+  document.getElementById('ssPrice').textContent = '$' + prod.price;
+  document.querySelectorAll('#ssPayRow .pay-btn').forEach(function(b){
+    b.classList.toggle('selected', b.dataset.pay === ssPay);
+  });
+  document.getElementById('saleSheet').classList.add('show');
+}
+
+document.querySelectorAll('#ssPayRow .pay-btn').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    ssPay = this.dataset.pay;
+    document.querySelectorAll('#ssPayRow .pay-btn').forEach(function(b){ b.classList.remove('selected'); });
+    this.classList.add('selected');
+  });
+});
+
+document.getElementById('ssConfirm').addEventListener('click', function(){
+  document.getElementById('saleSheet').classList.remove('show');
+  selectedPay = ssPay;
+  document.querySelectorAll('#mainPayRow .pay-btn').forEach(function(b){
+    b.classList.toggle('selected', b.dataset.pay === ssPay);
+  });
+  registerSale(ssProdId, ssPay);
+});
+
+document.getElementById('ssCancel').addEventListener('click', function(){
+  document.getElementById('saleSheet').classList.remove('show');
+});
+
+document.getElementById('saleSheet').addEventListener('click', function(e){
+  if (e.target === this) this.classList.remove('show');
+});
+
+/* ── REGISTER SALE ─────────────────────── */
+function registerSale(productId, payMethod) {
+  var prod = PRODUCTS.find(function(p){ return p.id === productId; });
+  if (!prod) return;
+  var payment = payMethod || selectedPay;
 
   sales.push({
     id:      Date.now(),
@@ -1167,7 +1231,7 @@ function registerSale(productId) {
     date:    todayStr(),
     product: productId,
     price:   prod.price,
-    payment: selectedPay,
+    payment: payment,
   });
   saveSales(sales);
 
