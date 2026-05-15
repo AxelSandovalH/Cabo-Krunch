@@ -1392,9 +1392,9 @@ var COST_ING = [
   { key: 'harina',     label: 'Harina',            unit: 'por g',   step: '0.001', decimals: 3, def: 0.067 },
   { key: 'huevo',      label: 'Huevo',             unit: 'por pza', step: '0.01',  decimals: 2, def: 5.00  },
   { key: 'leche',      label: 'Leche',             unit: 'por ml',  step: '0.001', decimals: 3, def: 0.025 },
-  { key: 'chopsticks', label: 'Chopstick',         unit: 'por pza', step: '0.01',  decimals: 2, def: 0     },
-  { key: 'papa',       label: 'Papa (add-on)',      unit: 'por pza', step: '0.01',  decimals: 2, def: 0     },
-  { key: 'aceite',     label: 'Aceite',            unit: 'por pza', step: '0.01',  decimals: 2, def: 0     },
+  { key: 'chopsticks', label: 'Chopstick',         unit: 'por pza', step: '0.01',  decimals: 2, def: 0.93  },
+  { key: 'papa',       label: 'Papa (add-on)',      unit: 'por pza', step: '0.01',  decimals: 2, def: 2.66  },
+  { key: 'aceite',     label: 'Aceite',            unit: 'por pza', step: '0.01',  decimals: 2, def: 3.17  },
 ];
 
 var RANCH_DEFAULTS = { mayo: 179.02, hierbas: 35, porciones: 85 };
@@ -1406,7 +1406,7 @@ function saveRanchData(d){ localStorage.setItem('ck_ranch', JSON.stringify(d)); 
 
 function getCosts() {
   var c = loadCosts() || {};
-  COST_ING.forEach(function(i){ if (c[i.key] === undefined) c[i.key] = i.def; });
+  COST_ING.forEach(function(i){ if (!c[i.key]) c[i.key] = i.def; });
   return c;
 }
 
