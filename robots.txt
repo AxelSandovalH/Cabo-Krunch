@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /sistema.html
+Disallow: /pagos.html
+
+Sitemap: https://cabokrunch.com/sitemap.xml
