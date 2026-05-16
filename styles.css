@@ -109,8 +109,10 @@ ul { list-style: none; }
   height: 40px;
   width: 40px;
   display: block;
-  border-radius: 50%;
+  border-radius: 50% !important;
   object-fit: cover;
+  overflow: hidden;
+  clip-path: circle(50%);
 }
 
 .nav-center {
@@ -614,8 +616,9 @@ ul { list-style: none; }
   width: 60px;
   display: block;
   margin: 0 auto;
-  border-radius: 50%;
+  border-radius: 50% !important;
   object-fit: cover;
+  clip-path: circle(50%);
 }
 .footer-nav {
   display: flex;
