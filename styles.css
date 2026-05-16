@@ -101,21 +101,14 @@ ul { list-style: none; }
 }
 
 .nav-logo {
-  font-family: 'Bangers', cursive;
-  font-size: 1.55rem;
-  letter-spacing: 4px;
-  color: var(--gold);
   line-height: 1;
+  display: flex;
+  align-items: center;
 }
-.nav-logo span {
+.nav-logo img {
+  height: 40px;
+  width: auto;
   display: block;
-  font-family: 'DM Sans', sans-serif;
-  font-weight: 400;
-  font-size: 0.42rem;
-  letter-spacing: 0.45em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-top: 3px;
 }
 
 .nav-center {
@@ -614,11 +607,11 @@ ul { list-style: none; }
   justify-content: space-between;
   gap: 20px;
 }
-.footer-logo {
-  font-family: 'Bangers', cursive;
-  font-size: 1.4rem;
-  letter-spacing: 4px;
-  color: var(--gold);
+.footer-logo img {
+  height: 60px;
+  width: auto;
+  display: block;
+  margin: 0 auto;
 }
 .footer-nav {
   display: flex;

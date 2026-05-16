@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#080808">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Krunch Costos">
+  <title>Costos — Cabo Krunch</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700&family=Bangers&display=swap" rel="stylesheet">
+  <link rel="icon" href="img/logo-icon.jpg" type="image/jpeg">
+  <link rel="apple-touch-icon" href="img/logo-icon.jpg">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --gold:    #C49A3C;
+      --gold-lt: #E2C06A;
+      --gold-dim: rgba(196,154,60,0.12);
+      --black:   #080808;
+      --bg:      #0c0c0c;
+      --card:    #111;
+      --raised:  #161616;
+      --cream:   #E8E4DC;
+      --muted:   #555;
+      --border:  rgba(255,255,255,0.07);
+      --border-g: rgba(196,154,60,0.18);
+      --green:   #22c55e;
+      --red:     #ef4444;
+      --orange:  #f97316;
+      --ease:    cubic-bezier(0.23, 1, 0.32, 1);
+      --safe-b:  env(safe-area-inset-bottom, 0px);
+      --safe-t:  env(safe-area-inset-top, 0px);
+    }
+
+    html, body { height: 100%; }
+    body {
+      background: var(--bg);
+      color: var(--cream);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 400;
+      display: flex;
+      flex-direction: column;
+      max-width: 480px;
+      margin: 0 auto;
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* TOP BAR */
+    .top-bar {
+      background: var(--black);
+      border-bottom: 1px solid var(--border);
+      padding: calc(14px + var(--safe-t)) 18px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .top-logo {
+      font-family: 'Bangers', cursive;
+      font-size: 1.3rem;
+      letter-spacing: 3px;
+      color: var(--gold);
+      line-height: 1;
+    }
+    .top-logo span {
+      display: block;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.48rem;
+      font-weight: 500;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .date-chip { font-size: 0.65rem; font-weight: 500; color: var(--muted); letter-spacing: 0.05em; }
+
+    /* TABS */
+    .tab-nav { display: flex; background: var(--black); border-bottom: 1px solid var(--border); flex-shrink: 0; }
+    .tab-btn {
+      flex: 1; background: none; border: none;
+      color: var(--muted); font-family: 'DM Sans', sans-serif;
+      font-weight: 600; font-size: 0.68rem; letter-spacing: 0.15em;
+      text-transform: uppercase; padding: 12px 6px; cursor: pointer;
+      position: relative; transition: color .2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .tab-btn::after {
+      content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+      height: 2px; background: var(--gold);
+      transform: scaleX(0); transition: transform .2s var(--ease);
+    }
+    .tab-btn.active { color: var(--gold); }
+    .tab-btn.active::after { transform: scaleX(1); }
+
+    /* SCROLL CONTENT */
+    .content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
+    .content::after { content: ''; display: block; height: calc(32px + var(--safe-b)); }
+    .tab-panel { display: none; padding: 16px 14px 0; }
+    .tab-panel.active { display: block; }
+
+    .sec-label {
+      font-size: 0.55rem; font-weight: 600; letter-spacing: 0.35em;
+      text-transform: uppercase; color: var(--muted);
+      margin-bottom: 8px; margin-top: 4px;
+    }
+
+    /* HOY CARD */
+    .hoy-card {
+      background: var(--card); border: 1px solid var(--border-g);
+      border-radius: 12px; padding: 16px; margin-bottom: 14px;
+      display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0;
+    }
+    .hoy-item { text-align: center; }
+    .hoy-item + .hoy-item { border-left: 1px solid var(--border); }
+    .hoy-label { font-size: 0.5rem; font-weight: 600; letter-spacing: 0.3em; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
+    .hoy-val   { font-size: 1.35rem; font-weight: 700; letter-spacing: -0.02em; line-height: 1; }
+    .hoy-val.green  { color: var(--green); }
+    .hoy-val.gold   { color: var(--gold); }
+    .hoy-val.cream  { color: var(--cream); }
+    .hoy-sub   { font-size: 0.52rem; color: var(--muted); margin-top: 3px; }
+
+    /* PRODUCT COST CARD */
+    .cost-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; overflow: hidden; margin-bottom: 10px;
+    }
+    .cost-head {
+      padding: 13px 14px 10px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+    .cost-product { font-size: 0.82rem; font-weight: 700; color: var(--cream); }
+    .cost-price   { font-size: 0.82rem; font-weight: 700; color: var(--gold); }
+
+    /* MARGIN BAR */
+    .margin-wrap { padding: 10px 14px 0; }
+    .margin-labels { display: flex; justify-content: space-between; margin-bottom: 5px; }
+    .margin-labels span { font-size: 0.55rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.2em; color: var(--muted); }
+    .margin-labels strong { color: var(--gold); font-size: 0.7rem; }
+    .margin-bar-bg { height: 6px; background: var(--raised); border-radius: 3px; overflow: hidden; margin-bottom: 12px; }
+    .margin-bar-fill { height: 100%; border-radius: 3px; transition: width .4s var(--ease); }
+
+    /* COST BREAKDOWN */
+    .cost-breakdown { padding: 0 14px 14px; }
+    .cost-row {
+      display: flex; justify-content: space-between;
+      font-size: 0.68rem; padding: 4px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.03);
+    }
+    .cost-row:last-child { border: none; }
+    .cr-label { color: var(--muted); }
+    .cr-val   { color: var(--cream); font-weight: 500; font-variant-numeric: tabular-nums; }
+    .cost-total-row {
+      display: flex; justify-content: space-between;
+      padding: 8px 14px 12px;
+      border-top: 1px solid var(--border);
+    }
+    .ct-label { font-size: 0.62rem; font-weight: 700; color: var(--cream); letter-spacing: 0.05em; text-transform: uppercase; }
+    .ct-costo { font-size: 0.88rem; font-weight: 700; color: var(--red); }
+    .ct-ganancia { font-size: 0.88rem; font-weight: 700; color: var(--green); }
+
+    /* INGREDIENT EDITOR */
+    .ing-list {
+      display: flex; flex-direction: column; gap: 1px;
+      background: var(--border); border-radius: 12px;
+      overflow: hidden; margin-bottom: 12px;
+    }
+    .ing-row {
+      background: var(--card); padding: 12px 14px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .ing-info { flex: 1; min-width: 0; }
+    .ing-name { font-size: 0.78rem; font-weight: 500; color: var(--cream); }
+    .ing-pack { font-size: 0.56rem; color: var(--muted); margin-top: 2px; }
+    .ing-unit-cost { font-size: 0.62rem; font-weight: 600; color: var(--gold); white-space: nowrap; }
+    .ing-price-wrap { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; }
+    .ing-price-label { font-size: 0.48rem; font-weight: 500; letter-spacing: 0.25em; text-transform: uppercase; color: var(--muted); }
+    .ing-price-input {
+      background: var(--raised); border: 1px solid var(--border);
+      border-radius: 6px; color: var(--cream); font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem; font-weight: 700; text-align: right;
+      width: 80px; padding: 5px 8px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .ing-price-input:focus { outline: none; border-color: var(--border-g); color: var(--gold); }
+
+    /* PROJECTION */
+    .proj-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 12px; }
+    .proj-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 12px 10px; text-align: center;
+    }
+    .proj-card.bottleneck { border-color: var(--border-g); background: var(--gold-dim); }
+    .proj-name  { font-size: 0.52rem; font-weight: 600; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 4px; line-height: 1.3; }
+    .proj-count { font-size: 1.5rem; font-weight: 700; color: var(--cream); line-height: 1; }
+    .proj-count.zero { color: var(--red); }
+    .proj-rev   { font-size: 0.58rem; color: var(--gold); margin-top: 3px; }
+
+    .alert-card {
+      background: var(--gold-dim); border: 1px solid var(--border-g);
+      border-radius: 10px; padding: 13px 14px; margin-bottom: 12px;
+    }
+    .alert-title { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 4px; }
+    .alert-body  { font-size: 0.72rem; color: var(--cream); line-height: 1.5; }
+
+    .summary-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; overflow: hidden; margin-bottom: 12px;
+    }
+    .sum-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 14px; border-bottom: 1px solid var(--border);
+      font-size: 0.72rem;
+    }
+    .sum-row:last-child { border: none; }
+    .sum-label { color: var(--muted); }
+    .sum-val   { font-weight: 700; color: var(--cream); }
+    .sum-val.gold  { color: var(--gold); }
+    .sum-val.green { color: var(--green); }
+    .sum-val.big   { font-size: 1.1rem; letter-spacing: -0.02em; }
+
+    /* TOAST */
+    .toast {
+      position: fixed; bottom: calc(20px + var(--safe-b)); left: 50%;
+      transform: translateX(-50%) translateY(12px);
+      background: var(--raised); border: 1px solid var(--border-g);
+      color: var(--cream); font-size: 0.75rem; font-weight: 600;
+      padding: 10px 24px; border-radius: 100px; white-space: nowrap;
+      opacity: 0; transition: opacity .18s, transform .18s;
+      pointer-events: none; z-index: 99;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+
+<div class="top-bar">
+  <div class="top-logo">
+    <img src="img/logo-icon.jpg" alt="Cabo Krunch" style="height:32px;width:auto;display:block;">
+    <span>Costos &amp; Márgenes</span>
+  </div>
+  <div class="date-chip" id="dateChip"></div>
+</div>
+
+<nav class="tab-nav">
+  <button class="tab-btn active" data-tab="costos">Costos</button>
+  <button class="tab-btn"        data-tab="ingredientes">Ingredientes</button>
+  <button class="tab-btn"        data-tab="proyeccion">Proyección</button>
+</nav>
+
+<main class="content">
+
+  <!-- ═══ COSTOS ═══ -->
+  <div class="tab-panel active" id="tab-costos">
+    <div class="sec-label">Hoy</div>
+    <div class="hoy-card" id="hoyCard">
+      <div class="hoy-item">
+        <div class="hoy-label">Ingresos</div>
+        <div class="hoy-val gold" id="hoyIngresos">$0</div>
+        <div class="hoy-sub" id="hoyVentas">0 ventas</div>
+      </div>
+      <div class="hoy-item">
+        <div class="hoy-label">Costo est.</div>
+        <div class="hoy-val cream" id="hoyCosto">$0</div>
+      </div>
+      <div class="hoy-item">
+        <div class="hoy-label">Ganancia</div>
+        <div class="hoy-val green" id="hoyGanancia">$0</div>
+        <div class="hoy-sub" id="hoyMargen">—</div>
+      </div>
+    </div>
+
+    <div class="sec-label">Márgenes por producto</div>
+    <div id="costCards"></div>
+  </div>
+
+  <!-- ═══ INGREDIENTES ═══ -->
+  <div class="tab-panel" id="tab-ingredientes">
+    <div class="sec-label">Precios de compra · toca para editar</div>
+    <div class="ing-list" id="ingList"></div>
+    <div class="sec-label" style="margin-top:8px">Guardado automático al editar</div>
+  </div>
+
+  <!-- ═══ PROYECCIÓN ═══ -->
+  <div class="tab-panel" id="tab-proyeccion">
+    <div class="sec-label">Con el stock actual puedes hacer</div>
+    <div class="proj-grid" id="projGrid"></div>
+    <div id="alertBottleneck"></div>
+    <div class="sec-label">Potencial si vendes todo</div>
+    <div class="summary-card" id="projSummary"></div>
+  </div>
+
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function () {
+'use strict';
+
+/* ── INGREDIENTES ────────────────────────
+   packPrice: precio por paquete en Costco/tienda
+   packQty:   unidades en ese paquete (g, ml, pzas)
+   unit:      unidad de medida
+   desc:      descripción del paquete
+──────────────────────────────────────── */
+var ING_DEF = {
+  salchicha:  { name: 'Salchichas de Res',    packPrice: 306.87, packQty: 12,    unit: 'pza', desc: 'Costco ~12 pzas'   },
+  queso:      { name: 'Mozzarella KS',         packPrice: 322.24, packQty: 2260,  unit: 'g',   desc: 'Costco bloque 2.26kg' },
+  harina:     { name: 'Harina Pancakes',       packPrice: 47,     packQty: 700,   unit: 'g',   desc: 'Bolsa 700g'        },
+  huevo:      { name: 'Huevo',                 packPrice: 5,      packQty: 1,     unit: 'pza', desc: 'Por pieza'         },
+  leche:      { name: 'Leche',                 packPrice: 300,    packQty: 12000, unit: 'ml',  desc: 'Cartón 12 litros'  },
+  chopsticks: { name: 'Chopsticks',            packPrice: 150,    packQty: 100,   unit: 'par', desc: 'Paquete 100 pares' },
+  aceite:     { name: 'Aceite (fritura)',       packPrice: 120,    packQty: 60,    unit: 'frida', desc: '~60 corn dogs por botella' },
+  salsas:     { name: 'Salsas / Condimentos',  packPrice: 214,    packQty: 70,    unit: 'porción', desc: 'Mayo + ranch ~70 porciones' },
+};
+
+/* ── RECETA POR CORN DOG ─────────────── */
+var RECIPE = {
+  res:   { salchicha: 1,   queso: 0,  harina: 60, huevo: 0.25, leche: 60, chopsticks: 1, aceite: 1, salsas: 1 },
+  mozz:  { salchicha: 0,   queso: 50, harina: 60, huevo: 0.25, leche: 60, chopsticks: 1, aceite: 1, salsas: 1 },
+  mitad: { salchicha: 0.5, queso: 30, harina: 60, huevo: 0.25, leche: 60, chopsticks: 1, aceite: 1, salsas: 1 },
+};
+
+/* ── PRODUCTOS ───────────────────────── */
+var PRODUCTS = [
+  { id: 'res',     name: 'Salchicha de Res',  base: 'res',   price: 80  },
+  { id: 'mozz',    name: 'Mozzarella',        base: 'mozz',  price: 80  },
+  { id: 'mitad',   name: 'Mitad y Mitad',     base: 'mitad', price: 80  },
+];
+
+/* ── INGREDIENTES DEL STOCK (sistema.html) ── */
+var STOCK_KEYS = ['salchicha','queso','chopsticks','harina','huevo','leche'];
+
+/* ── STORAGE ─────────────────────────── */
+var PRICE_KEY = 'ck_ing_prices';
+
+function loadPrices() {
+  try {
+    var saved = JSON.parse(localStorage.getItem(PRICE_KEY) || '{}');
+    for (var k in ING_DEF) {
+      if (saved[k] !== undefined) ING_DEF[k].packPrice = saved[k];
+    }
+  } catch(e){}
+}
+function savePrice(key, val) {
+  try {
+    var saved = JSON.parse(localStorage.getItem(PRICE_KEY) || '{}');
+    saved[key] = val;
+    localStorage.setItem(PRICE_KEY, JSON.stringify(saved));
+  } catch(e){}
+}
+function loadSales() {
+  try { return JSON.parse(localStorage.getItem('ck_sales') || '[]'); } catch(e){ return []; }
+}
+function loadStock() {
+  try {
+    var s = JSON.parse(localStorage.getItem('ck_stock') || 'null');
+    if (!s) { s = {}; STOCK_KEYS.forEach(function(k){ s[k] = 0; }); }
+    return s;
+  } catch(e){ return {}; }
+}
+
+/* ── CÁLCULOS ────────────────────────── */
+function cpUnit(key, qty) {
+  var d = ING_DEF[key];
+  if (!d || !qty) return 0;
+  return (d.packPrice / d.packQty) * qty;
+}
+
+function costoTotal(base) {
+  var r = RECIPE[base];
+  var t = 0;
+  for (var k in r) t += cpUnit(k, r[k]);
+  return t;
+}
+
+function pct(a, b) { return b ? Math.round(a / b * 100) : 0; }
+function fmt(n)   { return '$' + Math.round(n).toLocaleString('es-MX'); }
+function fmtD(n)  { return '$' + n.toFixed(2); }
+
+/* ── DATE CHIP ───────────────────────── */
+(function(){
+  var days   = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  var months = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  var d = new Date();
+  document.getElementById('dateChip').textContent = days[d.getDay()] + ' ' + d.getDate() + ' ' + months[d.getMonth()];
+}());
+
+/* ── TOAST ───────────────────────────── */
+var toastTimer;
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 1600);
+}
+
+/* ── TABS ────────────────────────────── */
+document.querySelectorAll('.tab-btn').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
+    document.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('active'); });
+    this.classList.add('active');
+    document.getElementById('tab-' + this.dataset.tab).classList.add('active');
+    document.querySelector('.content').scrollTop = 0;
+    var id = this.dataset.tab;
+    if (id === 'costos')       renderCostos();
+    if (id === 'ingredientes') renderIngredientes();
+    if (id === 'proyeccion')   renderProyeccion();
+  });
+});
+
+/* ── RENDER: COSTOS ──────────────────── */
+function renderCostos() {
+  /* Hoy */
+  var today = (function(){ var d=new Date(); return d.getFullYear()+'-'+(d.getMonth()+1+'').padStart(2,'0')+'-'+(d.getDate()+'').padStart(2,'0'); }());
+  var sales = loadSales().filter(function(s){ return s.date === today; });
+  var ingresos = sales.reduce(function(a,s){ return a + s.price; }, 0);
+  var costoHoy = 0;
+  sales.forEach(function(s){
+    var prod = ['res','res_p','mozz','mozz_p','mitad','mitad_p'].indexOf(s.product);
+    var base = s.product.replace('_p','');
+    costoHoy += costoTotal(base);
+  });
+  var ganancia = ingresos - costoHoy;
+  var margen   = pct(ganancia, ingresos);
+
+  document.getElementById('hoyIngresos').textContent = fmt(ingresos);
+  document.getElementById('hoyCosto').textContent    = fmt(costoHoy);
+  document.getElementById('hoyGanancia').textContent = fmt(ganancia);
+  document.getElementById('hoyVentas').textContent   = sales.length + ' ventas';
+  document.getElementById('hoyMargen').textContent   = ingresos ? margen + '% margen' : '—';
+
+  /* Cost cards */
+  var el = document.getElementById('costCards');
+  el.innerHTML = '';
+  PRODUCTS.forEach(function(p){
+    var costo    = costoTotal(p.base);
+    var margenAbs = p.price - costo;
+    var margenPct = pct(margenAbs, p.price);
+    var r = RECIPE[p.base];
+
+    /* Color for margin bar */
+    var barColor = margenPct >= 55 ? '#22c55e' : margenPct >= 40 ? '#C49A3C' : '#ef4444';
+
+    /* Breakdown rows */
+    var rows = '';
+    for (var k in r) {
+      if (!r[k]) continue;
+      var c = cpUnit(k, r[k]);
+      if (!c) continue;
+      rows += '<div class="cost-row"><span class="cr-label">' + ING_DEF[k].name + '</span><span class="cr-val">' + fmtD(c) + '</span></div>';
+    }
+
+    el.innerHTML +=
+      '<div class="cost-card">' +
+        '<div class="cost-head"><span class="cost-product">' + p.name + '</span><span class="cost-price">$' + p.price + ' MXN</span></div>' +
+        '<div class="margin-wrap">' +
+          '<div class="margin-labels"><span>Costo <strong>' + fmtD(costo) + '</strong></span><span>Ganancia <strong style="color:' + barColor + '">' + margenPct + '%</strong></span></div>' +
+          '<div class="margin-bar-bg"><div class="margin-bar-fill" style="width:' + margenPct + '%;background:' + barColor + '"></div></div>' +
+        '</div>' +
+        '<div class="cost-breakdown">' + rows + '</div>' +
+        '<div class="cost-total-row">' +
+          '<span class="ct-label">Costo total</span>' +
+          '<span class="ct-costo">' + fmtD(costo) + '</span>' +
+          '<span class="ct-ganancia">+ ' + fmtD(margenAbs) + '</span>' +
+        '</div>' +
+      '</div>';
+  });
+}
+
+/* ── RENDER: INGREDIENTES ────────────── */
+function renderIngredientes() {
+  var list = document.getElementById('ingList');
+  list.innerHTML = '';
+  for (var k in ING_DEF) {
+    var d = ING_DEF[k];
+    var unitCost = d.packPrice / d.packQty;
+    var unitLabel = unitCost < 1 ? fmtD(unitCost) + '/' + d.unit : fmt(unitCost) + '/' + d.unit;
+
+    var row = document.createElement('div');
+    row.className = 'ing-row';
+    row.dataset.key = k;
+    row.innerHTML =
+      '<div class="ing-info">' +
+        '<div class="ing-name">' + d.name + '</div>' +
+        '<div class="ing-pack">' + d.desc + '</div>' +
+        '<div class="ing-unit-cost">' + fmtD(d.packPrice / d.packQty) + ' / ' + d.unit + '</div>' +
+      '</div>' +
+      '<div class="ing-price-wrap">' +
+        '<div class="ing-price-label">Precio pack</div>' +
+        '<input class="ing-price-input" type="number" inputmode="decimal" value="' + d.packPrice + '" data-key="' + k + '">' +
+      '</div>';
+    list.appendChild(row);
+  }
+
+  list.querySelectorAll('.ing-price-input').forEach(function(inp){
+    inp.addEventListener('change', function(){
+      var val = parseFloat(this.value);
+      if (isNaN(val) || val <= 0) return;
+      var key = this.dataset.key;
+      ING_DEF[key].packPrice = val;
+      savePrice(key, val);
+      /* Update unit cost label */
+      var d = ING_DEF[key];
+      this.closest('.ing-row').querySelector('.ing-unit-cost').textContent = fmtD(d.packPrice / d.packQty) + ' / ' + d.unit;
+      showToast('Precio actualizado');
+      renderCostos();
+    });
+  });
+}
+
+/* ── RENDER: PROYECCIÓN ──────────────── */
+function renderProyeccion() {
+  var stock = loadStock();
+
+  /* Cuántos puedes hacer de cada base */
+  function canMake(base) {
+    var r = RECIPE[base];
+    var min = Infinity;
+    STOCK_KEYS.forEach(function(k){
+      if (!r[k]) return;
+      var possible = Math.floor((stock[k] || 0) / r[k]);
+      if (possible < min) min = possible;
+    });
+    return min === Infinity ? 0 : min;
+  }
+
+  var counts = { res: canMake('res'), mozz: canMake('mozz'), mitad: canMake('mitad') };
+  var total  = counts.res + counts.mozz + counts.mitad;
+
+  /* Botella: ingrediente más limitante */
+  var bottleneck = null, bottleneckQty = Infinity;
+  STOCK_KEYS.forEach(function(k){
+    var d = ING_DEF[k];
+    if (!d) return;
+    var qty = stock[k] || 0;
+    /* normalize to corn-dog units roughly */
+    var recipeUse = Math.max(
+      RECIPE.res[k] || 0,
+      RECIPE.mozz[k] || 0,
+      RECIPE.mitad[k] || 0
+    );
+    if (!recipeUse) return;
+    var possible = qty / recipeUse;
+    if (possible < bottleneckQty) { bottleneckQty = possible; bottleneck = k; }
+  });
+
+  /* Proyección financiera */
+  var revEst  = counts.res * 80 + counts.mozz * 80 + counts.mitad * 80;
+  var costEst = counts.res * costoTotal('res') + counts.mozz * costoTotal('mozz') + counts.mitad * costoTotal('mitad');
+  var gainEst = revEst - costEst;
+
+  /* Render grid */
+  var grid = document.getElementById('projGrid');
+  grid.innerHTML = '';
+  [
+    { label: 'Salchicha', base: 'res',   count: counts.res  },
+    { label: 'Mozz.',     base: 'mozz',  count: counts.mozz },
+    { label: 'Mitad',     base: 'mitad', count: counts.mitad },
+  ].forEach(function(item){
+    var card = document.createElement('div');
+    card.className = 'proj-card';
+    card.innerHTML =
+      '<div class="proj-name">' + item.label + '</div>' +
+      '<div class="proj-count' + (item.count === 0 ? ' zero' : '') + '">' + item.count + '</div>' +
+      '<div class="proj-rev">' + fmt(item.count * 80) + '</div>';
+    grid.appendChild(card);
+  });
+
+  /* Bottleneck alert */
+  var alertEl = document.getElementById('alertBottleneck');
+  if (bottleneck && bottleneckQty < 20) {
+    alertEl.innerHTML =
+      '<div class="alert-card">' +
+        '<div class="alert-title">Cuello de botella</div>' +
+        '<div class="alert-body">' + ING_DEF[bottleneck].name + ' es el ingrediente más limitante. ' +
+        'Con el stock actual alcanza para ~' + Math.floor(bottleneckQty) + ' corn dogs.</div>' +
+      '</div>';
+  } else {
+    alertEl.innerHTML = '';
+  }
+
+  /* Financial summary */
+  var sum = document.getElementById('projSummary');
+  sum.innerHTML =
+    '<div class="sum-row"><span class="sum-label">Corn dogs posibles</span><span class="sum-val big">' + total + '</span></div>' +
+    '<div class="sum-row"><span class="sum-label">Ingresos potenciales</span><span class="sum-val gold big">' + fmt(revEst) + '</span></div>' +
+    '<div class="sum-row"><span class="sum-label">Costo estimado</span><span class="sum-val">' + fmt(costEst) + '</span></div>' +
+    '<div class="sum-row"><span class="sum-label">Ganancia estimada</span><span class="sum-val green big">' + fmt(gainEst) + '</span></div>' +
+    '<div class="sum-row"><span class="sum-label">Margen promedio</span><span class="sum-val gold">' + pct(gainEst, revEst) + '%</span></div>';
+}
+
+/* ── BOOT ────────────────────────────── */
+loadPrices();
+renderCostos();
+
+}());
+</script>
+</body>
+</html>

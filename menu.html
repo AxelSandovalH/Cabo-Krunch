@@ -7,6 +7,8 @@
   <meta name="description" content="Menú de Cabo Krunch: corn dogs artesanales, desde la clásica banderilla hasta opciones con queso, jalapeño y más. Cabo San Lucas, BCS.">
   <meta name="keywords" content="menú cabo krunch, corn dog menú, banderilla, corn dog queso, corn dog jalapeño, Cabo San Lucas">
   <meta name="robots" content="index, follow">
+  <link rel="icon" href="img/logo-icon.jpg" type="image/jpeg">
+  <link rel="apple-touch-icon" href="img/logo-icon.jpg">
   <title>Menú — Cabo Krunch</title>
   <link rel="canonical" href="https://cabokrunch.com/menu.html">
 
@@ -69,19 +71,11 @@
       color: var(--gold);
       margin-bottom: 18px;
     }
-    .header h1 {
-      font-family: 'Cormorant Garamond', serif;
-      font-weight: 300;
-      font-style: italic;
-      font-size: clamp(4rem, 20vw, 6.5rem);
-      letter-spacing: -0.01em;
-      line-height: 0.88;
-      color: var(--cream);
-    }
-    .header h1 em {
-      color: var(--gold-lt);
-      font-style: italic;
+    .header-logo {
+      width: min(260px, 72vw);
+      height: auto;
       display: block;
+      margin: 0 auto;
     }
     .header-sub {
       margin-top: 16px;
@@ -399,7 +393,7 @@
   <!-- HEADER -->
   <header class="header">
     <p class="header-eyebrow">Corn Dogs Artesanales</p>
-    <h1>Cabo<em>Krunch</em></h1>
+    <img src="img/logo.jpg" alt="Cabo Krunch" class="header-logo">
     <p class="header-sub">Cabo San Lucas, B.C.S. &nbsp;·&nbsp; México</p>
   </header>
 
@@ -543,7 +537,7 @@
 
   <!-- FOOTER -->
   <footer class="footer">
-    <span class="footer-logo">CABO KRUNCH</span>
+    <img src="img/logo-icon.jpg" alt="Cabo Krunch" style="height:52px;width:auto;display:block;margin:0 auto 6px;">
     <p class="footer-copy">Cabo San Lucas · B.C.S. · México</p>
   </footer>
 
