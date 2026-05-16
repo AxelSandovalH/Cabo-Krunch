@@ -530,6 +530,50 @@
       line-height: 1.6;
     }
 
+    /* ── SUMMARY BLOCKS ────────────────────── */
+    .sum-block {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+    .sum-hero {
+      padding: 18px 16px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    .sum-hero-label {
+      font-size: 0.52rem;
+      font-weight: 600;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .sum-hero-val {
+      font-size: 3rem;
+      font-weight: 700;
+      color: var(--gold);
+      line-height: 1;
+      letter-spacing: -0.03em;
+    }
+    .sum-hero-sub {
+      font-size: 0.62rem;
+      color: var(--muted);
+      margin-top: 5px;
+    }
+    .sum-row {
+      padding: 10px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .sum-row:last-child { border-bottom: none; }
+    .sum-row-label { font-size: 0.75rem; color: var(--muted); }
+    .sum-row-val   { font-size: 0.88rem; font-weight: 700; color: var(--cream); }
+    .sum-row-val.gold { color: var(--gold); }
+
     /* ── TOAST ─────────────────────────────── */
     .toast {
       position: fixed;
@@ -866,17 +910,9 @@
     <button class="undo-btn" id="undoBtn" disabled>Deshacer última venta</button>
 
     <div class="sec-label">Resumen de hoy</div>
-    <div class="summary-card">
-      <div class="summary-top">
-        <div>
-          <div class="total-label" id="totalLabel">Total del día</div>
-          <div class="total-val" id="todayTotal">$0</div>
-          <div class="total-count" id="todayCount">0 ventas</div>
-        </div>
-        <div class="pay-pills" id="payPills"></div>
-      </div>
-      <div class="prod-breakdown" id="prodBreakdown"></div>
-    </div>
+    <div class="sum-block" id="summaryTotal"></div>
+    <div class="sum-block" id="summaryBanderillas"></div>
+    <div class="sum-block" id="summaryAguas"></div>
 
   </div>
 
@@ -1232,48 +1268,60 @@ document.getElementById('undoBtn').addEventListener('click', function(){
 });
 
 /* ── TODAY SUMMARY ─────────────────────── */
+function sumHero(label, val, sub) {
+  return '<div class="sum-hero">' +
+    '<div class="sum-hero-label">' + label + '</div>' +
+    '<div class="sum-hero-val">' + val + '</div>' +
+    (sub ? '<div class="sum-hero-sub">' + sub + '</div>' : '') +
+    '</div>';
+}
+function sumRow(label, val, gold) {
+  return '<div class="sum-row">' +
+    '<span class="sum-row-label">' + label + '</span>' +
+    '<span class="sum-row-val' + (gold ? ' gold' : '') + '">' + val + '</span>' +
+    '</div>';
+}
+
 function renderTodaySummary() {
-  var today  = todayStr();
-  var allDs  = sales.filter(function(s){ return s.date === today; });
-  var ds     = allDs.filter(function(s){ return s.payment === selectedPay; });
-  var total  = ds.reduce(function(a,s){ return a + s.price; }, 0);
-  var payObj = PAYMENTS.find(function(p){ return p.id === selectedPay; });
+  var today = todayStr();
+  var allDs = sales.filter(function(s){ return s.date === today; });
+  var totalAmt = allDs.reduce(function(a,s){ return a + s.price; }, 0);
 
-  document.getElementById('totalLabel').textContent = payObj ? payObj.label : 'Total';
-  document.getElementById('todayTotal').textContent = '$' + total.toLocaleString('es-MX');
-  document.getElementById('todayCount').textContent = ds.length + (ds.length === 1 ? ' venta' : ' ventas');
-
-  /* pay-pills: totales de TODOS los métodos, activo resaltado */
+  /* — Total + desglose por método de pago — */
   var payAgg = {};
   allDs.forEach(function(s){ payAgg[s.payment] = (payAgg[s.payment]||0) + s.price; });
-  var pillsEl = document.getElementById('payPills');
-  pillsEl.innerHTML = '';
-  PAYMENTS.forEach(function(p){
-    if (!payAgg[p.id]) return;
-    var pill = document.createElement('div');
-    pill.className = 'pay-pill' + (p.id === selectedPay ? ' active' : '');
-    pill.innerHTML = '<span class="pp-label">' + p.label + '</span><span class="pp-amt">$' + payAgg[p.id].toLocaleString('es-MX') + '</span>';
-    pillsEl.appendChild(pill);
-  });
+  var payRows = PAYMENTS.map(function(p){
+    return payAgg[p.id] ? sumRow(p.label, '$' + payAgg[p.id].toLocaleString('es-MX'), true) : '';
+  }).join('');
+  document.getElementById('summaryTotal').innerHTML =
+    sumHero('Total del día', '$' + totalAmt.toLocaleString('es-MX'), allDs.length + (allDs.length === 1 ? ' venta' : ' ventas')) +
+    (payRows || sumRow('Sin ventas', '—', false));
 
-  /* desglose por producto filtrado por método seleccionado */
-  var prodAgg = {};
-  PRODUCTS.forEach(function(p){ prodAgg[p.id] = { count: 0, total: 0 }; });
-  ds.forEach(function(s){
-    if (prodAgg[s.product]) { prodAgg[s.product].count++; prodAgg[s.product].total += s.price; }
+  /* — Banderillas — */
+  var bands = allDs.filter(function(s){
+    var p = PRODUCTS.find(function(p){ return p.id === s.product; });
+    return p && p.base !== 'agua';
   });
-  var bdEl = document.getElementById('prodBreakdown');
-  bdEl.innerHTML = '';
-  PRODUCTS.forEach(function(p){
-    var d = prodAgg[p.id];
-    var item = document.createElement('div');
-    item.className = 'bd-item';
-    item.innerHTML =
-      '<div class="bd-name">'  + p.name.replace('\n','<br>') + '</div>' +
-      '<div class="bd-count">' + d.count + '</div>' +
-      '<div class="bd-amt">'   + (d.total ? '$' + d.total : '—') + '</div>';
-    bdEl.appendChild(item);
+  var bandAgg = {};
+  bands.forEach(function(s){ bandAgg[s.product] = (bandAgg[s.product]||0) + 1; });
+  var bandRows = PRODUCTS.filter(function(p){ return p.base !== 'agua' && bandAgg[p.id]; })
+    .map(function(p){ return sumRow(p.name.replace('\n',' '), bandAgg[p.id] + ' pza', false); }).join('');
+  document.getElementById('summaryBanderillas').innerHTML =
+    sumHero('Banderillas', String(bands.length), '') +
+    (bandRows || sumRow('Sin ventas', '—', false));
+
+  /* — Aguas — */
+  var aguas = allDs.filter(function(s){
+    var p = PRODUCTS.find(function(p){ return p.id === s.product; });
+    return p && p.base === 'agua';
   });
+  var aguaAgg = {};
+  aguas.forEach(function(s){ aguaAgg[s.product] = (aguaAgg[s.product]||0) + 1; });
+  var aguaRows = PRODUCTS.filter(function(p){ return p.base === 'agua' && aguaAgg[p.id]; })
+    .map(function(p){ return sumRow(p.name.replace('\n',' '), aguaAgg[p.id] + ' pza', false); }).join('');
+  document.getElementById('summaryAguas').innerHTML =
+    sumHero('Aguas Frescas', String(aguas.length), '') +
+    (aguaRows || sumRow('Sin ventas', '—', false));
 }
 renderTodaySummary();
 var todayCount = sales.filter(function(s){ return s.date === todayStr(); }).length;
