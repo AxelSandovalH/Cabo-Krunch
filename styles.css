@@ -107,8 +107,10 @@ ul { list-style: none; }
 }
 .nav-logo img {
   height: 40px;
-  width: auto;
+  width: 40px;
   display: block;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 .nav-center {
@@ -609,9 +611,11 @@ ul { list-style: none; }
 }
 .footer-logo img {
   height: 60px;
-  width: auto;
+  width: 60px;
   display: block;
   margin: 0 auto;
+  border-radius: 50%;
+  object-fit: cover;
 }
 .footer-nav {
   display: flex;

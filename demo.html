@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Demo Setup — Cabo Krunch</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #070707;
+      color: #F0EBE1;
+      font-family: -apple-system, 'DM Sans', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100dvh;
+      padding: 32px 20px;
+      gap: 20px;
+    }
+    h1 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #C49A3C;
+    }
+    p { font-size: 0.82rem; color: #5A5552; text-align: center; max-width: 320px; line-height: 1.6; }
+    .btn {
+      width: 100%;
+      max-width: 320px;
+      padding: 16px;
+      border-radius: 12px;
+      border: none;
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: opacity .15s;
+    }
+    .btn:active { opacity: 0.75; }
+    .btn-load  { background: #C49A3C; color: #070707; }
+    .btn-clear { background: #161616; color: #5A5552; border: 1px solid #2a2826; }
+    .btn-go    { background: #0d0d0d; color: #E2C06A; border: 1px solid rgba(196,154,60,0.25); }
+    #status {
+      font-size: 0.75rem;
+      color: #22c55e;
+      letter-spacing: 0.08em;
+      min-height: 18px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Demo — Punto de Venta</h1>
+  <p>Carga ventas de prueba para los últimos 7 días y abre el sistema listo para demostrar.</p>
+
+  <button class="btn btn-load" onclick="loadDemo()">Cargar datos de demo</button>
+  <button class="btn btn-go"   onclick="location.href='sistema.html'">Abrir sistema →</button>
+  <button class="btn btn-clear" onclick="clearDemo()">Limpiar todo</button>
+
+  <div id="status"></div>
+
+<script>
+  var PRODUCTS = [
+    { id: 'corn-dog',  name: 'Corn Dog',          price: 65  },
+    { id: 'mini-x3',   name: 'Mini x3',            price: 55  },
+    { id: 'con-papa',  name: 'Con Papa',            price: 90  },
+    { id: 'krunch-box',name: 'Krunch Box x6',       price: 140 },
+    { id: 'papas',     name: 'Papas',               price: 45  }
+  ];
+
+  var PAYMENTS = ['efectivo', 'transferencia', 'apple'];
+
+  // Weighted random — corn dogs & minis sell the most
+  var WEIGHTS = [40, 28, 15, 10, 7];
+
+  function weightedProduct() {
+    var r = Math.random() * 100, cum = 0;
+    for (var i = 0; i < PRODUCTS.length; i++) {
+      cum += WEIGHTS[i];
+      if (r < cum) return PRODUCTS[i];
+    }
+    return PRODUCTS[0];
+  }
+
+  function weightedPayment() {
+    var r = Math.random();
+    if (r < 0.50) return 'efectivo';
+    if (r < 0.80) return 'transferencia';
+    return 'apple';
+  }
+
+  function dateStr(daysAgo) {
+    var d = new Date();
+    d.setDate(d.getDate() - daysAgo);
+    return d.toISOString().slice(0, 10);
+  }
+
+  function loadDemo() {
+    var sales = [];
+    var id = Date.now();
+
+    // Build 7 days of sales (busier on weekends heuristic)
+    var daySizes = [18, 22, 14, 11, 25, 30, 20]; // today=0 … 6 days ago
+    daySizes.forEach(function(count, daysAgo) {
+      var date = dateStr(daysAgo);
+      for (var i = 0; i < count; i++) {
+        var prod = weightedProduct();
+        sales.push({
+          id:      id++,
+          date:    date,
+          product: prod.id,
+          name:    prod.name,
+          price:   prod.price,
+          payment: weightedPayment()
+        });
+      }
+    });
+
+    localStorage.setItem('ck_sales', JSON.stringify(sales));
+
+    // Unlock PIN so demo opens directly
+    sessionStorage.setItem('ck_unlocked', '1');
+
+    var total = sales.filter(function(s){ return s.date === dateStr(0); })
+                     .reduce(function(a,s){ return a + s.price; }, 0);
+
+    document.getElementById('status').textContent =
+      '✓ ' + sales.length + ' ventas cargadas · Hoy: $' + total.toLocaleString('es-MX');
+  }
+
+  function clearDemo() {
+    localStorage.removeItem('ck_sales');
+    sessionStorage.removeItem('ck_unlocked');
+    document.getElementById('status').textContent = '✓ Datos borrados';
+  }
+</script>
+
+</body>
+</html>
