@@ -1026,6 +1026,12 @@ var PRODUCTS = [
   { id: 'mozz_p',  name: 'Mozz\n+ Papa',        price: 85,  base: 'mozz'  },
   { id: 'mitad',   name: 'Mitad\ny Mitad',      price: 80,  base: 'mitad' },
   { id: 'mitad_p', name: 'Mitad\n+ Papa',       price: 85,  base: 'mitad' },
+  { id: 'agua_maracuya',  name: 'Mara-\ncuyá',         price: 30,  base: 'agua'  },
+  { id: 'agua_naranja',   name: 'Na-\nranja',          price: 30,  base: 'agua'  },
+  { id: 'agua_pepino',    name: 'Pepino\nc/ Limón',    price: 30,  base: 'agua'  },
+  { id: 'agua_jamaica',   name: 'Ja-\nmaica',          price: 30,  base: 'agua'  },
+  { id: 'agua_horchata',  name: 'Hor-\nchata',         price: 30,  base: 'agua'  },
+  { id: 'agua_tamarindo', name: 'Tama-\nrindo',        price: 30,  base: 'agua'  },
 ];
 
 var STOCK_DEF = {
@@ -1041,6 +1047,7 @@ var RECIPE = {
   res:   { salchicha: 1,   chopsticks: 1, harina: 60, huevo: 0.25, leche: 43 },
   mozz:  { queso: 50,      chopsticks: 1, harina: 60, huevo: 0.25, leche: 43 },
   mitad: { salchicha: 0.5, queso: 30,    chopsticks: 1, harina: 60, huevo: 0.25, leche: 43 },
+  agua:  { agua: 1 },
 };
 
 var PAYMENTS = [
@@ -1135,7 +1142,16 @@ document.querySelectorAll('.tab-btn').forEach(function(btn){
 /* ── PRODUCT BUTTONS ───────────────────── */
 (function(){
   var grid = document.getElementById('productGrid');
+  var aguaLabelAdded = false;
   PRODUCTS.forEach(function(p){
+    if (p.base === 'agua' && !aguaLabelAdded) {
+      var lbl = document.createElement('div');
+      lbl.className = 'sec-label';
+      lbl.style.cssText = 'grid-column:1/-1;margin-top:8px;margin-bottom:0';
+      lbl.textContent = 'Aguas Frescas';
+      grid.appendChild(lbl);
+      aguaLabelAdded = true;
+    }
     var btn = document.createElement('button');
     btn.className = 'prod-btn';
     btn.dataset.id = p.id;
@@ -1397,6 +1413,7 @@ var COST_ING = [
   { key: 'chopsticks', label: 'Chopstick',         unit: 'por pza', step: '0.01',  decimals: 2, def: 0.93  },
   { key: 'papa',       label: 'Papa (add-on)',      unit: 'por pza', step: '0.01',  decimals: 2, def: 2.66  },
   { key: 'aceite',     label: 'Aceite',            unit: 'por pza', step: '0.01',  decimals: 2, def: 3.17  },
+  { key: 'agua',       label: 'Agua Fresca',       unit: 'por vaso', step: '0.01', decimals: 2, def: 17    },
 ];
 
 var RANCH_DEFAULTS = { mayo: 179.02, hierbas: 35, porciones: 85 };
@@ -1425,8 +1442,10 @@ function calcProductCost(prod, costs, ranchPorPorcion) {
   if (!recipe) return 0;
   var cost = 0;
   for (var ing in recipe) { cost += recipe[ing] * (costs[ing] || 0); }
-  cost += ranchPorPorcion;
-  cost += (costs.aceite || 0);
+  if (prod.base !== 'agua') {
+    cost += ranchPorPorcion;
+    cost += (costs.aceite || 0);
+  }
   if (prod.id.slice(-2) === '_p') cost += (costs.papa || 0);
   return cost;
 }
