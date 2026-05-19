@@ -848,6 +848,282 @@
       margin-bottom: 12px;
       line-height: 1.5;
     }
+
+    /* ── CART BAR ──────────────────────────── */
+    .cart-bar {
+      display: none;
+      background: var(--card);
+      border: 1px solid var(--border-g);
+      border-radius: 12px;
+      padding: 10px 12px 10px 14px;
+      margin-bottom: 12px;
+      align-items: center;
+      gap: 10px;
+    }
+    .cart-bar.has-items { display: flex; }
+    .cart-summary {
+      flex: 1;
+      min-width: 0;
+    }
+    .cart-count {
+      font-size: 0.52rem;
+      font-weight: 600;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 2px;
+    }
+    .cart-total {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--gold);
+      line-height: 1;
+      letter-spacing: -0.02em;
+    }
+    .cart-sell-btn {
+      background: var(--gold);
+      color: #000;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 18px;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 700;
+      font-size: 0.78rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .cart-sell-btn:active { opacity: 0.8; transform: scale(0.97); }
+    .cart-clear-btn {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 1.1rem;
+      cursor: pointer;
+      padding: 4px 6px;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      flex-shrink: 0;
+      line-height: 1;
+    }
+    .prod-btn .p-badge {
+      display: none;
+      position: absolute;
+      top: 8px; right: 8px;
+      background: var(--gold);
+      color: #000;
+      font-size: 0.58rem;
+      font-weight: 700;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+    .prod-btn.in-cart { border-color: var(--border-g); background: #141414; }
+    .prod-btn.in-cart .p-badge { display: flex; }
+
+    /* ── SELL SHEET ────────────────────────── */
+    .sell-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.75);
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      z-index: 1001;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s;
+      padding-bottom: var(--safe-b);
+    }
+    .sell-overlay.show { opacity: 1; pointer-events: all; }
+    .sell-sheet {
+      background: var(--card);
+      border-radius: 20px 20px 0 0;
+      border-top: 1px solid var(--border-g);
+      padding: 20px 20px 28px;
+      width: 100%;
+      max-width: 480px;
+      transform: translateY(20px);
+      transition: transform .25s cubic-bezier(0.23,1,0.32,1);
+      max-height: 90dvh;
+      overflow-y: auto;
+    }
+    .sell-overlay.show .sell-sheet { transform: translateY(0); }
+    .sell-handle {
+      width: 36px; height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      margin: 0 auto 18px;
+    }
+    .sell-label {
+      font-size: 0.52rem;
+      font-weight: 600;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .sell-items {
+      background: var(--raised);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+    .sell-item {
+      display: flex;
+      align-items: center;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      gap: 10px;
+    }
+    .sell-item:last-child { border-bottom: none; }
+    .sell-item-qty {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--gold);
+      width: 22px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .sell-item-name {
+      flex: 1;
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--cream);
+    }
+    .sell-item-sub {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--cream);
+    }
+    .sell-total-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      background: var(--raised);
+      border-radius: 10px;
+      margin-bottom: 16px;
+    }
+    .sell-total-label {
+      font-size: 0.55rem;
+      font-weight: 600;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .sell-total-val {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--gold);
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+    .sell-change-section { margin-bottom: 16px; }
+    .sell-input-wrap {
+      position: relative;
+      margin-bottom: 8px;
+    }
+    .sell-input-prefix {
+      position: absolute;
+      left: 14px; top: 50%;
+      transform: translateY(-50%);
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--muted);
+      pointer-events: none;
+    }
+    .sell-cash-input {
+      width: 100%;
+      background: var(--raised);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 14px 14px 28px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--cream);
+      caret-color: var(--gold);
+      -webkit-appearance: none;
+      outline: none;
+      transition: border-color .15s;
+    }
+    .sell-cash-input:focus { border-color: var(--border-g); }
+    .sell-change-display {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      background: var(--raised);
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      transition: border-color .15s, background .15s;
+    }
+    .sell-change-display.ready {
+      border-color: rgba(34,197,94,0.3);
+      background: rgba(34,197,94,0.06);
+    }
+    .sell-change-display.short {
+      border-color: rgba(239,68,68,0.3);
+      background: rgba(239,68,68,0.06);
+    }
+    .sell-change-lbl {
+      font-size: 0.55rem;
+      font-weight: 600;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .sell-change-val {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+    .sell-change-display.ready  .sell-change-val { color: var(--green); }
+    .sell-change-display.short  .sell-change-val { color: var(--red); }
+    .sell-confirm-btn {
+      width: 100%;
+      background: var(--gold);
+      color: #000;
+      border: none;
+      border-radius: 12px;
+      padding: 16px;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 700;
+      font-size: 0.9rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      transition: opacity .15s;
+      margin-top: 4px;
+    }
+    .sell-confirm-btn:active { opacity: 0.8; }
+    .sell-confirm-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .sell-cancel-btn {
+      width: 100%;
+      background: none;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 13px;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 600;
+      font-size: 0.78rem;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      margin-top: 8px;
+    }
   </style>
 </head>
 <body>
@@ -909,6 +1185,16 @@
 
     <div class="sec-label">Producto</div>
     <div class="product-grid" id="productGrid"></div>
+
+    <!-- CART BAR -->
+    <div class="cart-bar" id="cartBar">
+      <div class="cart-summary">
+        <div class="cart-count" id="cartCount">0 productos</div>
+        <div class="cart-total" id="cartTotal">$0</div>
+      </div>
+      <button class="cart-sell-btn" id="cartSellBtn">Vender</button>
+      <button class="cart-clear-btn" id="cartClearBtn" title="Vaciar carrito">✕</button>
+    </div>
 
     <button class="undo-btn" id="undoBtn" disabled>Deshacer última venta</button>
 
@@ -1004,6 +1290,36 @@
       <button class="modal-btn cancel"  id="modalCancel">Cancelar</button>
       <button class="modal-btn confirm" id="modalConfirm">Confirmar</button>
     </div>
+  </div>
+</div>
+
+<!-- SELL SHEET -->
+<div class="sell-overlay" id="sellOverlay">
+  <div class="sell-sheet">
+    <div class="sell-handle"></div>
+
+    <div class="sell-label">Orden</div>
+    <div class="sell-items" id="sellItems"></div>
+
+    <div class="sell-total-row">
+      <div class="sell-total-label">Total</div>
+      <div class="sell-total-val" id="sellTotalVal">$0</div>
+    </div>
+
+    <div class="sell-change-section" id="sellChangeSection">
+      <div class="sell-label">¿Con cuánto te pagan?</div>
+      <div class="sell-input-wrap">
+        <span class="sell-input-prefix">$</span>
+        <input class="sell-cash-input" id="sellCashInput" type="tel" inputmode="numeric" placeholder="0" autocomplete="off">
+      </div>
+      <div class="sell-change-display" id="sellChangeDisplay">
+        <span class="sell-change-lbl">Cambio</span>
+        <span class="sell-change-val" id="sellChangeVal">—</span>
+      </div>
+    </div>
+
+    <button class="sell-confirm-btn" id="sellConfirmBtn">Confirmar venta</button>
+    <button class="sell-cancel-btn"  id="sellCancelBtn">Cancelar</button>
   </div>
 </div>
 
@@ -1124,6 +1440,7 @@ function fmtDateFull(str) {
 var selectedPay = 'efectivo';
 var sales = loadSales();
 var stock = getStock();
+var cart  = {}; // { productId: quantity }
 
 /* ── DATE CHIP ─────────────────────────── */
 (function() {
@@ -1196,11 +1513,165 @@ document.querySelectorAll('.tab-btn').forEach(function(btn){
     btn.dataset.id = p.id;
     btn.innerHTML =
       '<span class="p-name">' + p.name.replace('\n','<br>') + '</span>' +
-      '<span class="p-price">$' + p.price + '</span>';
-    btn.addEventListener('click', function(){ registerSale(p.id); });
+      '<span class="p-price">$' + p.price + '</span>' +
+      '<span class="p-badge" id="badge-' + p.id + '">1</span>';
+    btn.addEventListener('click', function(){ addToCart(p.id); });
     grid.appendChild(btn);
   });
 }());
+
+/* ── CART ──────────────────────────────── */
+function cartTotal() {
+  return Object.keys(cart).reduce(function(sum, id) {
+    var prod = PRODUCTS.find(function(p){ return p.id === id; });
+    return sum + (prod ? prod.price * cart[id] : 0);
+  }, 0);
+}
+function cartItemCount() {
+  return Object.keys(cart).reduce(function(s,id){ return s + cart[id]; }, 0);
+}
+
+function addToCart(productId) {
+  cart[productId] = (cart[productId] || 0) + 1;
+  renderCartBar();
+  var btn = document.querySelector('[data-id="' + productId + '"]');
+  if (btn) {
+    btn.classList.add('in-cart', 'flash');
+    var badge = document.getElementById('badge-' + productId);
+    if (badge) badge.textContent = cart[productId];
+    setTimeout(function(){ btn.classList.remove('flash'); }, 280);
+  }
+}
+
+function renderCartBar() {
+  var bar   = document.getElementById('cartBar');
+  var count = cartItemCount();
+  var total = cartTotal();
+  if (count === 0) {
+    bar.classList.remove('has-items');
+    return;
+  }
+  bar.classList.add('has-items');
+  document.getElementById('cartCount').textContent = count + (count === 1 ? ' producto' : ' productos');
+  document.getElementById('cartTotal').textContent  = '$' + total.toLocaleString('es-MX');
+}
+
+function clearCart() {
+  cart = {};
+  PRODUCTS.forEach(function(p){
+    var btn = document.querySelector('[data-id="' + p.id + '"]');
+    if (btn) {
+      btn.classList.remove('in-cart');
+      var badge = document.getElementById('badge-' + p.id);
+      if (badge) badge.textContent = '1';
+    }
+  });
+  renderCartBar();
+}
+
+document.getElementById('cartClearBtn').addEventListener('click', function(){ clearCart(); });
+document.getElementById('cartSellBtn').addEventListener('click', function(){ openSellSheet(); });
+
+/* ── SELL SHEET ────────────────────────── */
+function openSellSheet() {
+  if (cartItemCount() === 0) return;
+  var total = cartTotal();
+
+  // Build items list
+  var html = '';
+  PRODUCTS.forEach(function(p){
+    if (!cart[p.id]) return;
+    var qty = cart[p.id];
+    var sub = p.price * qty;
+    html += '<div class="sell-item">' +
+      '<span class="sell-item-qty">×' + qty + '</span>' +
+      '<span class="sell-item-name">' + p.name.replace('\n',' ') + '</span>' +
+      '<span class="sell-item-sub">$' + sub.toLocaleString('es-MX') + '</span>' +
+    '</div>';
+  });
+  document.getElementById('sellItems').innerHTML = html;
+  document.getElementById('sellTotalVal').textContent = '$' + total.toLocaleString('es-MX');
+
+  // Show/hide change section based on payment method
+  var isEfectivo = selectedPay === 'efectivo';
+  document.getElementById('sellChangeSection').style.display = isEfectivo ? '' : 'none';
+  document.getElementById('sellConfirmBtn').disabled = isEfectivo; // requires valid amount
+
+  // Reset input
+  var input = document.getElementById('sellCashInput');
+  input.value = '';
+  updateChange();
+
+  document.getElementById('sellOverlay').classList.add('show');
+  if (isEfectivo) setTimeout(function(){ input.focus(); }, 300);
+}
+
+function updateChange() {
+  var total  = cartTotal();
+  var input  = document.getElementById('sellCashInput');
+  var paid   = parseInt(input.value.replace(/\D/g,''), 10) || 0;
+  var disp   = document.getElementById('sellChangeDisplay');
+  var val    = document.getElementById('sellChangeVal');
+  var btn    = document.getElementById('sellConfirmBtn');
+
+  if (!paid) {
+    disp.className = 'sell-change-display';
+    val.textContent = '—';
+    btn.disabled = true;
+    return;
+  }
+  var change = paid - total;
+  if (change < 0) {
+    disp.className = 'sell-change-display short';
+    val.textContent = '−$' + Math.abs(change).toLocaleString('es-MX');
+    btn.disabled = true;
+  } else {
+    disp.className = 'sell-change-display ready';
+    val.textContent = '$' + change.toLocaleString('es-MX');
+    btn.disabled = false;
+  }
+}
+
+document.getElementById('sellCashInput').addEventListener('input', updateChange);
+
+document.getElementById('sellCancelBtn').addEventListener('click', function(){
+  document.getElementById('sellOverlay').classList.remove('show');
+});
+document.getElementById('sellOverlay').addEventListener('click', function(e){
+  if (e.target === this) this.classList.remove('show');
+});
+
+document.getElementById('sellConfirmBtn').addEventListener('click', function(){
+  document.getElementById('sellOverlay').classList.remove('show');
+
+  var ts      = new Date().toISOString();
+  var date    = todayStr();
+  var payment = selectedPay;
+  var total   = cartTotal();
+  var count   = cartItemCount();
+
+  // Register one sale entry per item quantity
+  PRODUCTS.forEach(function(p){
+    if (!cart[p.id]) return;
+    for (var i = 0; i < cart[p.id]; i++) {
+      sales.push({ id: Date.now() + Math.random(), ts: ts, date: date, product: p.id, price: p.price, payment: payment });
+      var recipe = RECIPE[p.base];
+      if (recipe) {
+        for (var ing in recipe) {
+          if (stock[ing] !== undefined) stock[ing] = Math.max(0, stock[ing] - recipe[ing]);
+        }
+      }
+    }
+  });
+  saveSales(sales);
+  saveStock(stock);
+
+  document.getElementById('undoBtn').disabled = false;
+  renderTodaySummary();
+  clearCart();
+
+  showToast(count + (count===1?' venta':' ventas') + ' &nbsp;<span class="t-price">$' + total.toLocaleString('es-MX') + '</span>');
+});
 
 /* ── PAYMENT FILTER (resumen) ──────────── */
 document.querySelectorAll('#mainPayRow .pay-btn').forEach(function(btn){
@@ -1211,38 +1682,6 @@ document.querySelectorAll('#mainPayRow .pay-btn').forEach(function(btn){
     renderTodaySummary();
   });
 });
-
-/* ── REGISTER SALE ─────────────────────── */
-function registerSale(productId) {
-  var prod = PRODUCTS.find(function(p){ return p.id === productId; });
-  if (!prod) return;
-  var payment = selectedPay;
-
-  sales.push({
-    id:      Date.now(),
-    ts:      new Date().toISOString(),
-    date:    todayStr(),
-    product: productId,
-    price:   prod.price,
-    payment: payment,
-  });
-  saveSales(sales);
-
-  var recipe = RECIPE[prod.base];
-  if (recipe) {
-    for (var ing in recipe) {
-      if (stock[ing] !== undefined) stock[ing] = Math.max(0, stock[ing] - recipe[ing]);
-    }
-    saveStock(stock);
-  }
-
-  var btn = document.querySelector('[data-id="' + productId + '"]');
-  if (btn) { btn.classList.add('flash'); setTimeout(function(){ btn.classList.remove('flash'); }, 280); }
-
-  document.getElementById('undoBtn').disabled = false;
-  renderTodaySummary();
-  showToast(prod.name.replace('\n',' ') + ' &nbsp;<span class="t-price">$' + prod.price + '</span>');
-}
 
 /* ── UNDO ──────────────────────────────── */
 document.getElementById('undoBtn').addEventListener('click', function(){
