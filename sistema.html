@@ -749,6 +749,155 @@
     }
     .pin-error.show { opacity: 1; }
 
+    /* ── CART ──────────────────────────────── */
+    .cart-wrap {
+      background: var(--card);
+      border: 1px solid var(--border-g);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 12px;
+      display: none;
+    }
+    .cart-wrap.has-items { display: block; }
+    .cart-header {
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+    .cart-header-label {
+      font-size: 0.55rem;
+      font-weight: 600;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+    .cart-clear-btn {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.65rem;
+      font-weight: 600;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      padding: 4px 0;
+    }
+    .cart-item {
+      padding: 9px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .cart-item:last-child { border-bottom: none; }
+    .cart-item-name {
+      flex: 1;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--cream);
+      line-height: 1.3;
+    }
+    .cart-qty-ctrl {
+      display: flex;
+      align-items: center;
+      background: var(--raised);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .cart-qty-btn {
+      background: none;
+      border: none;
+      color: var(--gold);
+      font-size: 0.9rem;
+      font-weight: 700;
+      width: 28px;
+      height: 28px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .cart-qty-val {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--cream);
+      min-width: 22px;
+      text-align: center;
+      border-left: 1px solid var(--border);
+      border-right: 1px solid var(--border);
+      line-height: 28px;
+    }
+    .cart-item-price {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--gold);
+      min-width: 42px;
+      text-align: right;
+    }
+    .cart-footer {
+      padding: 12px 14px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background: var(--raised);
+    }
+    .cart-total-label {
+      font-size: 0.52rem;
+      font-weight: 600;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 3px;
+    }
+    .cart-total-val {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--gold);
+      line-height: 1;
+    }
+    .sell-btn {
+      background: var(--gold);
+      border: none;
+      border-radius: 10px;
+      padding: 14px 28px;
+      color: #000;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 700;
+      font-size: 0.92rem;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: opacity .15s;
+      flex-shrink: 0;
+    }
+    .sell-btn:active { opacity: 0.75; }
+    .prod-btn .p-badge {
+      position: absolute;
+      top: 7px;
+      right: 8px;
+      background: var(--gold);
+      color: #000;
+      font-size: 0.58rem;
+      font-weight: 700;
+      width: 17px;
+      height: 17px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transform: scale(0.5);
+      transition: opacity .15s, transform .15s var(--ease);
+      pointer-events: none;
+    }
+    .prod-btn.in-cart .p-badge { opacity: 1; transform: scale(1); }
+
     /* ── COSTOS TAB ───────────────────────── */
     .cost-input {
       background: var(--raised);
@@ -908,6 +1057,21 @@
 
     <div class="sec-label">Producto</div>
     <div class="product-grid" id="productGrid"></div>
+
+    <div class="cart-wrap" id="cartWrap">
+      <div class="cart-header">
+        <span class="cart-header-label">Carrito</span>
+        <button class="cart-clear-btn" id="cartClearBtn">Limpiar</button>
+      </div>
+      <div id="cartItems"></div>
+      <div class="cart-footer">
+        <div>
+          <div class="cart-total-label">Total</div>
+          <div class="cart-total-val" id="cartTotal">$0</div>
+        </div>
+        <button class="sell-btn" id="sellBtn">Vender</button>
+      </div>
+    </div>
 
     <button class="undo-btn" id="undoBtn" disabled>Deshacer última venta</button>
 
@@ -1123,6 +1287,12 @@ function fmtDateFull(str) {
 var selectedPay = 'efectivo';
 var sales = loadSales();
 var stock = getStock();
+var cart  = {};
+
+function getSaleItems(s) {
+  if (s.items) return s.items;
+  return [{ product: s.product, price: s.price, qty: 1 }];
+}
 
 /* ── DATE CHIP ─────────────────────────── */
 (function() {
@@ -1195,8 +1365,9 @@ document.querySelectorAll('.tab-btn').forEach(function(btn){
     btn.dataset.id = p.id;
     btn.innerHTML =
       '<span class="p-name">' + p.name.replace('\n','<br>') + '</span>' +
-      '<span class="p-price">$' + p.price + '</span>';
-    btn.addEventListener('click', function(){ registerSale(p.id); });
+      '<span class="p-price">$' + p.price + '</span>' +
+      '<span class="p-badge">0</span>';
+    btn.addEventListener('click', function(){ addToCart(p.id); });
     grid.appendChild(btn);
   });
 }());
@@ -1211,54 +1382,138 @@ document.querySelectorAll('#mainPayRow .pay-btn').forEach(function(btn){
   });
 });
 
-/* ── REGISTER SALE ─────────────────────── */
-function registerSale(productId) {
+/* ── CART ──────────────────────────────── */
+function addToCart(productId) {
   var prod = PRODUCTS.find(function(p){ return p.id === productId; });
   if (!prod) return;
-  var payment = selectedPay;
-
-  sales.push({
-    id:      Date.now(),
-    ts:      new Date().toISOString(),
-    date:    todayStr(),
-    product: productId,
-    price:   prod.price,
-    payment: payment,
-  });
-  saveSales(sales);
-
-  var recipe = RECIPE[prod.base];
-  if (recipe) {
-    for (var ing in recipe) {
-      if (stock[ing] !== undefined) stock[ing] = Math.max(0, stock[ing] - recipe[ing]);
-    }
-    saveStock(stock);
-  }
-
+  cart[productId] = (cart[productId] || 0) + 1;
   var btn = document.querySelector('[data-id="' + productId + '"]');
   if (btn) { btn.classList.add('flash'); setTimeout(function(){ btn.classList.remove('flash'); }, 280); }
+  renderCart();
+}
 
+function renderCart() {
+  var wrap    = document.getElementById('cartWrap');
+  var itemsEl = document.getElementById('cartItems');
+  var totalEl = document.getElementById('cartTotal');
+  var keys    = Object.keys(cart).filter(function(k){ return cart[k] > 0; });
+
+  if (!keys.length) {
+    wrap.classList.remove('has-items');
+    PRODUCTS.forEach(function(p) {
+      var b = document.querySelector('[data-id="' + p.id + '"]');
+      if (b) b.classList.remove('in-cart');
+    });
+    return;
+  }
+
+  wrap.classList.add('has-items');
+  itemsEl.innerHTML = '';
+  var total = 0;
+
+  keys.forEach(function(productId) {
+    var qty  = cart[productId];
+    var prod = PRODUCTS.find(function(p){ return p.id === productId; });
+    if (!prod) return;
+    var sub = prod.price * qty;
+    total += sub;
+
+    var item = document.createElement('div');
+    item.className = 'cart-item';
+    item.innerHTML =
+      '<span class="cart-item-name">' + prod.name.replace('\n',' ') + '</span>' +
+      '<div class="cart-qty-ctrl">' +
+        '<button class="cart-qty-btn" data-pid="' + productId + '" data-d="-1">−</button>' +
+        '<span class="cart-qty-val">' + qty + '</span>' +
+        '<button class="cart-qty-btn" data-pid="' + productId + '" data-d="1">+</button>' +
+      '</div>' +
+      '<span class="cart-item-price">$' + sub + '</span>';
+    itemsEl.appendChild(item);
+
+    var b = document.querySelector('[data-id="' + productId + '"]');
+    if (b) {
+      b.classList.add('in-cart');
+      var badge = b.querySelector('.p-badge');
+      if (badge) badge.textContent = qty;
+    }
+  });
+
+  PRODUCTS.forEach(function(p) {
+    if (!cart[p.id]) {
+      var b = document.querySelector('[data-id="' + p.id + '"]');
+      if (b) b.classList.remove('in-cart');
+    }
+  });
+
+  totalEl.textContent = '$' + total;
+
+  itemsEl.querySelectorAll('.cart-qty-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var pid = this.dataset.pid;
+      cart[pid] = (cart[pid] || 0) + parseInt(this.dataset.d, 10);
+      if (cart[pid] <= 0) delete cart[pid];
+      renderCart();
+    });
+  });
+}
+
+function commitSale() {
+  var keys = Object.keys(cart).filter(function(k){ return cart[k] > 0; });
+  if (!keys.length) return;
+  var items = [];
+  var total = 0;
+  keys.forEach(function(productId) {
+    var qty  = cart[productId];
+    var prod = PRODUCTS.find(function(p){ return p.id === productId; });
+    if (!prod) return;
+    items.push({ product: productId, price: prod.price, qty: qty });
+    total += prod.price * qty;
+    var recipe = RECIPE[prod.base];
+    if (recipe) {
+      for (var ing in recipe) {
+        if (stock[ing] !== undefined) stock[ing] = Math.max(0, stock[ing] - recipe[ing] * qty);
+      }
+    }
+  });
+  saveStock(stock);
+  sales.push({ id: Date.now(), ts: new Date().toISOString(), date: todayStr(), payment: selectedPay, items: items, total: total });
+  saveSales(sales);
+  cart = {};
+  renderCart();
   document.getElementById('undoBtn').disabled = false;
   renderTodaySummary();
-  showToast(prod.name.replace('\n',' ') + ' &nbsp;<span class="t-price">$' + prod.price + '</span>');
+  var count = items.reduce(function(a,i){ return a + i.qty; }, 0);
+  showToast(count + ' artículo' + (count > 1 ? 's' : '') + ' &nbsp;<span class="t-price">$' + total + '</span>');
 }
 
 /* ── UNDO ──────────────────────────────── */
 document.getElementById('undoBtn').addEventListener('click', function(){
   var todaySales = sales.filter(function(s){ return s.date === todayStr(); });
   if (!todaySales.length) return;
-  var last = todaySales[todaySales.length - 1];
-  var prod = PRODUCTS.find(function(p){ return p.id === last.product; });
-  var payLabel = PAYMENTS.find(function(p){ return p.id === last.payment; });
+  var last      = todaySales[todaySales.length - 1];
+  var lastItems = getSaleItems(last);
+  var lastTotal = last.total !== undefined ? last.total : last.price;
+  var payLabel  = PAYMENTS.find(function(p){ return p.id === last.payment; });
+  var itemsText = lastItems.map(function(item) {
+    var prod = PRODUCTS.find(function(p){ return p.id === item.product; });
+    var qty  = item.qty || 1;
+    return (prod ? prod.name.replace('\n',' ') : item.product) + (qty > 1 ? ' ×' + qty : '') + ' — $' + (item.price * qty);
+  }).join('\n');
   showModal(
     'Deshacer venta',
-    (prod ? prod.name.replace('\n',' ') : last.product) + '  ·  $' + last.price + '  ·  ' + (payLabel ? payLabel.label : last.payment) + '\n' +
+    itemsText + '\nTotal: $' + lastTotal + '  ·  ' + (payLabel ? payLabel.label : last.payment) + '\n' +
     new Date(last.ts).toLocaleTimeString('es-MX', { hour:'2-digit', minute:'2-digit' }),
     function() {
-      if (prod) {
+      lastItems.forEach(function(item) {
+        var prod = PRODUCTS.find(function(p){ return p.id === item.product; });
+        if (!prod) return;
         var recipe = RECIPE[prod.base];
-        if (recipe) { for (var ing in recipe) { if (stock[ing] !== undefined) stock[ing] += recipe[ing]; } saveStock(stock); }
-      }
+        if (recipe) {
+          var qty = item.qty || 1;
+          for (var ing in recipe) { if (stock[ing] !== undefined) stock[ing] += recipe[ing] * qty; }
+        }
+      });
+      saveStock(stock);
       sales.splice(sales.indexOf(last), 1);
       saveSales(sales);
       var remaining = sales.filter(function(s){ return s.date === todayStr(); });
@@ -1287,11 +1542,13 @@ function sumRow(label, val, gold) {
 function renderTodaySummary() {
   var today = todayStr();
   var allDs = sales.filter(function(s){ return s.date === today; });
-  var totalAmt = allDs.reduce(function(a,s){ return a + s.price; }, 0);
+  var totalAmt = allDs.reduce(function(a,s){ return a + (s.total !== undefined ? s.total : s.price); }, 0);
 
-  /* — Total + desglose por método de pago — */
   var payAgg = {};
-  allDs.forEach(function(s){ payAgg[s.payment] = (payAgg[s.payment]||0) + s.price; });
+  allDs.forEach(function(s){
+    var amt = s.total !== undefined ? s.total : s.price;
+    payAgg[s.payment] = (payAgg[s.payment]||0) + amt;
+  });
   var payRows = PAYMENTS.map(function(p){
     return payAgg[p.id] ? sumRow(p.label, '$' + payAgg[p.id].toLocaleString('es-MX'), true) : '';
   }).join('');
@@ -1299,30 +1556,29 @@ function renderTodaySummary() {
     sumHero('Total del día', '$' + totalAmt.toLocaleString('es-MX'), allDs.length + (allDs.length === 1 ? ' venta' : ' ventas')) +
     (payRows || sumRow('Sin ventas', '—', false));
 
-  /* — Banderillas — */
-  var bands = allDs.filter(function(s){
-    var p = PRODUCTS.find(function(p){ return p.id === s.product; });
-    return p && p.base !== 'agua';
+  var bandAgg = {}, aguaAgg = {};
+  allDs.forEach(function(s){
+    getSaleItems(s).forEach(function(item){
+      var p = PRODUCTS.find(function(pr){ return pr.id === item.product; });
+      if (!p) return;
+      var q = item.qty || 1;
+      if (p.base !== 'agua') bandAgg[item.product] = (bandAgg[item.product]||0) + q;
+      else                   aguaAgg[item.product] = (aguaAgg[item.product]||0) + q;
+    });
   });
-  var bandAgg = {};
-  bands.forEach(function(s){ bandAgg[s.product] = (bandAgg[s.product]||0) + 1; });
+
+  var bandTotal = 0; for (var bk in bandAgg) bandTotal += bandAgg[bk];
   var bandRows = PRODUCTS.filter(function(p){ return p.base !== 'agua' && bandAgg[p.id]; })
     .map(function(p){ return sumRow(p.name.replace('\n',' '), bandAgg[p.id] + ' pza', false); }).join('');
   document.getElementById('summaryBanderillas').innerHTML =
-    sumHero('Banderillas', String(bands.length), '') +
+    sumHero('Banderillas', String(bandTotal), '') +
     (bandRows || sumRow('Sin ventas', '—', false));
 
-  /* — Aguas — */
-  var aguas = allDs.filter(function(s){
-    var p = PRODUCTS.find(function(p){ return p.id === s.product; });
-    return p && p.base === 'agua';
-  });
-  var aguaAgg = {};
-  aguas.forEach(function(s){ aguaAgg[s.product] = (aguaAgg[s.product]||0) + 1; });
+  var aguaTotal = 0; for (var ak in aguaAgg) aguaTotal += aguaAgg[ak];
   var aguaRows = PRODUCTS.filter(function(p){ return p.base === 'agua' && aguaAgg[p.id]; })
     .map(function(p){ return sumRow(p.name.replace('\n',' '), aguaAgg[p.id] + ' pza', false); }).join('');
   document.getElementById('summaryAguas').innerHTML =
-    sumHero('Aguas Frescas', String(aguas.length), '') +
+    sumHero('Aguas Frescas', String(aguaTotal), '') +
     (aguaRows || sumRow('Sin ventas', '—', false));
 }
 renderTodaySummary();
@@ -1385,17 +1641,24 @@ document.getElementById('resetStockBtn').addEventListener('click', function(){
 document.getElementById('dedStockBtn').addEventListener('click', function(){
   var ds = sales.filter(function(s){ return s.date === todayStr(); });
   if (!ds.length) { showToast('Sin ventas hoy'); return; }
-  showModal('Deducir ventas de hoy', 'Descuenta los ingredientes usados en ' + ds.length + ' venta(s) de hoy.\nSolo si el stock no se dedujo automáticamente.', function(){
+  var count = ds.reduce(function(a,s){ return a+getSaleItems(s).reduce(function(b,i){ return b+(i.qty||1); },0); }, 0);
+  showModal('Deducir ventas de hoy', 'Descuenta los ingredientes usados en ' + count + ' artículo(s) de hoy.\nSolo si el stock no se dedujo automáticamente.', function(){
     ds.forEach(function(s){
-      var prod = PRODUCTS.find(function(p){ return p.id === s.product; });
-      if (!prod) return;
-      var r = RECIPE[prod.base]; if (!r) return;
-      for (var ing in r) { if (stock[ing]!==undefined) stock[ing] = Math.max(0, stock[ing]-r[ing]); }
+      getSaleItems(s).forEach(function(item){
+        var prod = PRODUCTS.find(function(p){ return p.id === item.product; });
+        if (!prod) return;
+        var r = RECIPE[prod.base]; if (!r) return;
+        var qty = item.qty||1;
+        for (var ing in r) { if (stock[ing]!==undefined) stock[ing] = Math.max(0, stock[ing]-r[ing]*qty); }
+      });
     });
     saveStock(stock); renderStock(); showToast('Stock actualizado');
   });
 });
 renderStock();
+
+document.getElementById('cartClearBtn').addEventListener('click', function(){ cart = {}; renderCart(); });
+document.getElementById('sellBtn').addEventListener('click', commitSale);
 
 /* ── HISTORIAL ─────────────────────────── */
 function renderHistorial() {
@@ -1404,9 +1667,12 @@ function renderHistorial() {
   var monthAgo = new Date(now); monthAgo.setDate(1);
   var ws=0, wr=0, ms=0, mr=0;
   sales.forEach(function(s){
-    var d = new Date(s.ts);
-    if (d>=weekAgo)  { ws++; wr+=s.price; }
-    if (d>=monthAgo) { ms++; mr+=s.price; }
+    var d      = new Date(s.ts);
+    var sItems = getSaleItems(s);
+    var sTotal = s.total !== undefined ? s.total : s.price;
+    var sCount = sItems.reduce(function(a,i){ return a+(i.qty||1); }, 0);
+    if (d>=weekAgo)  { ws+=sCount; wr+=sTotal; }
+    if (d>=monthAgo) { ms+=sCount; mr+=sTotal; }
   });
   document.getElementById('weekSales').textContent   = ws;
   document.getElementById('weekRevenue').textContent = '$'+wr.toLocaleString('es-MX');
@@ -1425,13 +1691,17 @@ function renderHistorial() {
   list.innerHTML = '';
   dates.forEach(function(date){
     var ds    = byDay[date];
-    var total = ds.reduce(function(a,s){ return a+s.price; },0);
+    var total = ds.reduce(function(a,s){ return a+(s.total!==undefined?s.total:s.price); },0);
     var isToday = date === todayStr();
 
     var pAgg={}, pyAgg={};
     PRODUCTS.forEach(function(p){ pAgg[p.id]=0; });
     PAYMENTS.forEach(function(p){ pyAgg[p.id]=0; });
-    ds.forEach(function(s){ if(pAgg[s.product]!==undefined) pAgg[s.product]++; if(pyAgg[s.payment]!==undefined) pyAgg[s.payment]+=s.price; });
+    ds.forEach(function(s){
+      getSaleItems(s).forEach(function(item){ if(pAgg[item.product]!==undefined) pAgg[item.product]+=(item.qty||1); });
+      var sTotal=s.total!==undefined?s.total:s.price;
+      if(pyAgg[s.payment]!==undefined) pyAgg[s.payment]+=sTotal;
+    });
 
     var rows='';
     PRODUCTS.forEach(function(p){ if(!pAgg[p.id]) return; rows+='<div class="hdb-row"><span class="hdr-label">'+p.name.replace('\n',' ')+'</span><span class="hdr-val">'+pAgg[p.id]+' · $'+(pAgg[p.id]*p.price)+'</span></div>'; });
