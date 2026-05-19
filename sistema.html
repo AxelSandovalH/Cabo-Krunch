@@ -930,14 +930,14 @@
     /* ── SELL SHEET ────────────────────────── */
     .sell-overlay {
       position: fixed; inset: 0;
-      background: rgba(0,0,0,0.75);
+      background: rgba(0,0,0,0.82);
       display: flex;
       align-items: flex-end;
       justify-content: center;
       z-index: 1001;
       opacity: 0;
       pointer-events: none;
-      transition: opacity .2s;
+      transition: opacity .18s;
       padding-bottom: var(--safe-b);
     }
     .sell-overlay.show { opacity: 1; pointer-events: all; }
@@ -945,185 +945,124 @@
       background: var(--card);
       border-radius: 20px 20px 0 0;
       border-top: 1px solid var(--border-g);
-      padding: 20px 20px 28px;
+      padding: 14px 16px 20px;
       width: 100%;
       max-width: 480px;
-      transform: translateY(20px);
-      transition: transform .25s cubic-bezier(0.23,1,0.32,1);
-      max-height: 90dvh;
-      overflow-y: auto;
+      transform: translateY(24px);
+      transition: transform .22s cubic-bezier(0.23,1,0.32,1);
     }
     .sell-overlay.show .sell-sheet { transform: translateY(0); }
     .sell-handle {
       width: 36px; height: 4px;
       background: var(--border);
       border-radius: 2px;
-      margin: 0 auto 18px;
+      margin: 0 auto 14px;
     }
-    .sell-label {
-      font-size: 0.52rem;
-      font-weight: 600;
-      letter-spacing: 0.35em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 8px;
-    }
-    .sell-items {
-      background: var(--raised);
-      border-radius: 10px;
-      overflow: hidden;
+    /* top row: order + total */
+    .sell-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
       margin-bottom: 14px;
     }
+    .sell-items { flex: 1; }
     .sell-item {
       display: flex;
-      align-items: center;
-      padding: 10px 14px;
-      border-bottom: 1px solid var(--border);
-      gap: 10px;
+      align-items: baseline;
+      gap: 6px;
+      margin-bottom: 4px;
     }
-    .sell-item:last-child { border-bottom: none; }
-    .sell-item-qty {
-      font-size: 0.72rem;
-      font-weight: 700;
-      color: var(--gold);
-      width: 22px;
-      text-align: center;
-      flex-shrink: 0;
-    }
-    .sell-item-name {
-      flex: 1;
-      font-size: 0.78rem;
-      font-weight: 500;
-      color: var(--cream);
-    }
-    .sell-item-sub {
-      font-size: 0.78rem;
-      font-weight: 700;
-      color: var(--cream);
-    }
-    .sell-total-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 14px;
-      background: var(--raised);
-      border-radius: 10px;
-      margin-bottom: 16px;
-    }
-    .sell-total-label {
-      font-size: 0.55rem;
-      font-weight: 600;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      color: var(--muted);
+    .sell-item-qty  { font-size: 0.7rem; font-weight: 700; color: var(--gold); min-width: 20px; }
+    .sell-item-name { font-size: 0.82rem; font-weight: 500; color: var(--cream); flex:1; }
+    .sell-item-sub  { font-size: 0.78rem; font-weight: 700; color: var(--muted); }
+    .sell-total-block { text-align: right; flex-shrink: 0; }
+    .sell-total-lbl {
+      font-size: 0.48rem; font-weight: 600;
+      letter-spacing: 0.35em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 2px;
     }
     .sell-total-val {
-      font-size: 1.8rem;
-      font-weight: 700;
-      color: var(--gold);
-      letter-spacing: -0.02em;
-      line-height: 1;
+      font-size: 2.4rem; font-weight: 700;
+      color: var(--gold); line-height: 1;
+      letter-spacing: -0.03em;
     }
-    .sell-change-section { margin-bottom: 16px; }
-    .sell-input-wrap {
-      position: relative;
-      margin-bottom: 8px;
+    /* bill grid */
+    .sell-bills-lbl {
+      font-size: 0.48rem; font-weight: 600;
+      letter-spacing: 0.35em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 8px;
     }
-    .sell-input-prefix {
-      position: absolute;
-      left: 14px; top: 50%;
-      transform: translateY(-50%);
-      font-size: 1rem;
-      font-weight: 700;
-      color: var(--muted);
-      pointer-events: none;
+    .sell-bills {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+      margin-bottom: 10px;
     }
-    .sell-cash-input {
-      width: 100%;
+    .bill-btn {
       background: var(--raised);
       border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 14px 14px 14px 28px;
+      border-radius: 8px;
+      padding: 12px 4px;
       font-family: 'DM Sans', sans-serif;
-      font-size: 1.3rem;
+      font-size: 0.82rem;
       font-weight: 700;
       color: var(--cream);
-      caret-color: var(--gold);
-      -webkit-appearance: none;
-      outline: none;
-      transition: border-color .15s;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      transition: background .12s, border-color .12s, color .12s, transform .1s;
+      text-align: center;
+      line-height: 1;
     }
-    .sell-cash-input:focus { border-color: var(--border-g); }
-    .sell-change-display {
+    .bill-btn:active { transform: scale(0.93); }
+    .bill-btn.selected {
+      background: var(--gold-dim);
+      border-color: var(--border-g);
+      color: var(--gold);
+    }
+    /* change display */
+    .sell-change-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 12px 14px;
       background: var(--raised);
-      border-radius: 10px;
       border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 11px 14px;
+      margin-bottom: 10px;
       transition: border-color .15s, background .15s;
     }
-    .sell-change-display.ready {
-      border-color: rgba(34,197,94,0.3);
-      background: rgba(34,197,94,0.06);
-    }
-    .sell-change-display.short {
-      border-color: rgba(239,68,68,0.3);
-      background: rgba(239,68,68,0.06);
-    }
+    .sell-change-row.ready { border-color: rgba(34,197,94,0.35); background: rgba(34,197,94,0.07); }
     .sell-change-lbl {
-      font-size: 0.55rem;
-      font-weight: 600;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      color: var(--muted);
+      font-size: 0.48rem; font-weight: 600;
+      letter-spacing: 0.35em; text-transform: uppercase; color: var(--muted);
     }
     .sell-change-val {
-      font-size: 1.4rem;
-      font-weight: 700;
-      color: var(--muted);
-      letter-spacing: -0.02em;
-      line-height: 1;
+      font-size: 1.6rem; font-weight: 700;
+      color: var(--muted); letter-spacing: -0.02em; line-height: 1;
     }
-    .sell-change-display.ready  .sell-change-val { color: var(--green); }
-    .sell-change-display.short  .sell-change-val { color: var(--red); }
+    .sell-change-row.ready .sell-change-val { color: var(--green); }
+    /* confirm */
     .sell-confirm-btn {
       width: 100%;
       background: var(--gold);
       color: #000;
       border: none;
       border-radius: 12px;
-      padding: 16px;
+      padding: 17px;
       font-family: 'DM Sans', sans-serif;
       font-weight: 700;
-      font-size: 0.9rem;
-      letter-spacing: 0.1em;
+      font-size: 0.95rem;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
       cursor: pointer;
       -webkit-tap-highlight-color: transparent;
       touch-action: manipulation;
-      transition: opacity .15s;
-      margin-top: 4px;
+      transition: opacity .12s, transform .1s;
     }
-    .sell-confirm-btn:active { opacity: 0.8; }
-    .sell-confirm-btn:disabled { opacity: 0.35; cursor: not-allowed; }
-    .sell-cancel-btn {
-      width: 100%;
-      background: none;
-      color: var(--muted);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 13px;
-      font-family: 'DM Sans', sans-serif;
-      font-weight: 600;
-      font-size: 0.78rem;
-      letter-spacing: 0.1em;
-      cursor: pointer;
-      -webkit-tap-highlight-color: transparent;
-      touch-action: manipulation;
-      margin-top: 8px;
-    }
+    .sell-confirm-btn:active { opacity: 0.8; transform: scale(0.98); }
+    .sell-confirm-btn:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
   </style>
 </head>
 <body>
@@ -1298,28 +1237,24 @@
   <div class="sell-sheet">
     <div class="sell-handle"></div>
 
-    <div class="sell-label">Orden</div>
-    <div class="sell-items" id="sellItems"></div>
-
-    <div class="sell-total-row">
-      <div class="sell-total-label">Total</div>
-      <div class="sell-total-val" id="sellTotalVal">$0</div>
+    <div class="sell-top">
+      <div class="sell-items" id="sellItems"></div>
+      <div class="sell-total-block">
+        <div class="sell-total-lbl">Total</div>
+        <div class="sell-total-val" id="sellTotalVal">$0</div>
+      </div>
     </div>
 
-    <div class="sell-change-section" id="sellChangeSection">
-      <div class="sell-label">¿Con cuánto te pagan?</div>
-      <div class="sell-input-wrap">
-        <span class="sell-input-prefix">$</span>
-        <input class="sell-cash-input" id="sellCashInput" type="tel" inputmode="numeric" placeholder="0" autocomplete="off">
-      </div>
-      <div class="sell-change-display" id="sellChangeDisplay">
+    <div id="sellCashSection">
+      <div class="sell-bills-lbl">¿Con cuánto te pagan?</div>
+      <div class="sell-bills" id="sellBills"></div>
+      <div class="sell-change-row" id="sellChangeRow">
         <span class="sell-change-lbl">Cambio</span>
         <span class="sell-change-val" id="sellChangeVal">—</span>
       </div>
     </div>
 
-    <button class="sell-confirm-btn" id="sellConfirmBtn">Confirmar venta</button>
-    <button class="sell-cancel-btn"  id="sellCancelBtn">Cancelar</button>
+    <button class="sell-confirm-btn" id="sellConfirmBtn" disabled>Confirmar</button>
   </div>
 </div>
 
@@ -1573,105 +1508,108 @@ document.getElementById('cartClearBtn').addEventListener('click', function(){ cl
 document.getElementById('cartSellBtn').addEventListener('click', function(){ openSellSheet(); });
 
 /* ── SELL SHEET ────────────────────────── */
+var BILLS = [20, 50, 100, 200, 500];
+var selectedBill = 0;
+
 function openSellSheet() {
   if (cartItemCount() === 0) return;
-  var total = cartTotal();
+  var total      = cartTotal();
+  var isEfectivo = selectedPay === 'efectivo';
+  selectedBill   = 0;
 
-  // Build items list
+  // Items
   var html = '';
   PRODUCTS.forEach(function(p){
     if (!cart[p.id]) return;
-    var qty = cart[p.id];
-    var sub = p.price * qty;
     html += '<div class="sell-item">' +
-      '<span class="sell-item-qty">×' + qty + '</span>' +
+      '<span class="sell-item-qty">×' + cart[p.id] + '</span>' +
       '<span class="sell-item-name">' + p.name.replace('\n',' ') + '</span>' +
-      '<span class="sell-item-sub">$' + sub.toLocaleString('es-MX') + '</span>' +
+      '<span class="sell-item-sub">$' + (p.price * cart[p.id]).toLocaleString('es-MX') + '</span>' +
     '</div>';
   });
   document.getElementById('sellItems').innerHTML = html;
   document.getElementById('sellTotalVal').textContent = '$' + total.toLocaleString('es-MX');
 
-  // Show/hide change section based on payment method
-  var isEfectivo = selectedPay === 'efectivo';
-  document.getElementById('sellChangeSection').style.display = isEfectivo ? '' : 'none';
-  document.getElementById('sellConfirmBtn').disabled = isEfectivo; // requires valid amount
+  // Cash section
+  var cashSection = document.getElementById('sellCashSection');
+  cashSection.style.display = isEfectivo ? '' : 'none';
 
-  // Reset input
-  var input = document.getElementById('sellCashInput');
-  input.value = '';
-  updateChange();
+  if (isEfectivo) {
+    // Build bill buttons — only show bills >= total
+    var billsHtml = '';
+    BILLS.forEach(function(b){
+      billsHtml += '<button class="bill-btn" data-bill="' + b + '">$' + b + '</button>';
+    });
+    document.getElementById('sellBills').innerHTML = billsHtml;
+    document.querySelectorAll('.bill-btn').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        selectedBill = parseInt(this.dataset.bill, 10);
+        document.querySelectorAll('.bill-btn').forEach(function(b){ b.classList.remove('selected'); });
+        this.classList.add('selected');
+        updateChange();
+      });
+    });
+    document.getElementById('sellChangeRow').className = 'sell-change-row';
+    document.getElementById('sellChangeVal').textContent = '—';
+    document.getElementById('sellConfirmBtn').disabled = true;
+  } else {
+    // Transferencia / Apple Pay → ready immediately
+    document.getElementById('sellConfirmBtn').disabled = false;
+  }
 
   document.getElementById('sellOverlay').classList.add('show');
-  if (isEfectivo) setTimeout(function(){ input.focus(); }, 300);
 }
 
 function updateChange() {
   var total  = cartTotal();
-  var input  = document.getElementById('sellCashInput');
-  var paid   = parseInt(input.value.replace(/\D/g,''), 10) || 0;
-  var disp   = document.getElementById('sellChangeDisplay');
+  var change = selectedBill - total;
+  var row    = document.getElementById('sellChangeRow');
   var val    = document.getElementById('sellChangeVal');
   var btn    = document.getElementById('sellConfirmBtn');
 
-  if (!paid) {
-    disp.className = 'sell-change-display';
+  if (!selectedBill) {
+    row.className = 'sell-change-row';
     val.textContent = '—';
     btn.disabled = true;
     return;
   }
-  var change = paid - total;
-  if (change < 0) {
-    disp.className = 'sell-change-display short';
-    val.textContent = '−$' + Math.abs(change).toLocaleString('es-MX');
-    btn.disabled = true;
-  } else {
-    disp.className = 'sell-change-display ready';
-    val.textContent = '$' + change.toLocaleString('es-MX');
+  if (change >= 0) {
+    row.className = 'sell-change-row ready';
+    val.textContent = change === 0 ? 'Exacto' : '$' + change.toLocaleString('es-MX');
     btn.disabled = false;
+  } else {
+    row.className = 'sell-change-row';
+    val.textContent = '—';
+    btn.disabled = true;
   }
 }
 
-document.getElementById('sellCashInput').addEventListener('input', updateChange);
-
-document.getElementById('sellCancelBtn').addEventListener('click', function(){
-  document.getElementById('sellOverlay').classList.remove('show');
-});
 document.getElementById('sellOverlay').addEventListener('click', function(e){
   if (e.target === this) this.classList.remove('show');
 });
 
-document.getElementById('sellConfirmBtn').addEventListener('click', function(){
+function commitSale() {
   document.getElementById('sellOverlay').classList.remove('show');
+  var ts = new Date().toISOString(), date = todayStr(), payment = selectedPay;
+  var total = cartTotal(), count = cartItemCount();
 
-  var ts      = new Date().toISOString();
-  var date    = todayStr();
-  var payment = selectedPay;
-  var total   = cartTotal();
-  var count   = cartItemCount();
-
-  // Register one sale entry per item quantity
   PRODUCTS.forEach(function(p){
     if (!cart[p.id]) return;
     for (var i = 0; i < cart[p.id]; i++) {
       sales.push({ id: Date.now() + Math.random(), ts: ts, date: date, product: p.id, price: p.price, payment: payment });
       var recipe = RECIPE[p.base];
-      if (recipe) {
-        for (var ing in recipe) {
-          if (stock[ing] !== undefined) stock[ing] = Math.max(0, stock[ing] - recipe[ing]);
-        }
-      }
+      if (recipe) for (var ing in recipe) { if (stock[ing] !== undefined) stock[ing] = Math.max(0, stock[ing] - recipe[ing]); }
     }
   });
   saveSales(sales);
   saveStock(stock);
-
   document.getElementById('undoBtn').disabled = false;
   renderTodaySummary();
   clearCart();
-
   showToast(count + (count===1?' venta':' ventas') + ' &nbsp;<span class="t-price">$' + total.toLocaleString('es-MX') + '</span>');
-});
+}
+
+document.getElementById('sellConfirmBtn').addEventListener('click', commitSale);
 
 /* ── PAYMENT FILTER (resumen) ──────────── */
 document.querySelectorAll('#mainPayRow .pay-btn').forEach(function(btn){
