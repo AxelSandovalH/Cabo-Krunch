@@ -222,6 +222,17 @@
       color: var(--gold);
       line-height: 1;
     }
+    .prod-btn .p-key {
+      position: absolute;
+      bottom: 7px; right: 8px;
+      font-size: 0.52rem;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: 0;
+      line-height: 1;
+      opacity: 0.5;
+    }
+    .prod-btn.in-cart .p-key { opacity: 0; }
 
     /* ── UNDO ──────────────────────────────── */
     .undo-btn {
@@ -1310,18 +1321,18 @@ if (sessionStorage.getItem('ck_unlocked') === '1') {
 
 /* ── DATA ──────────────────────────────── */
 var PRODUCTS = [
-  { id: 'res',     name: 'Salchicha\nde Res',  price: 80,  base: 'res'   },
-  { id: 'res_p',   name: 'Res\n+ Papa',        price: 85,  base: 'res'   },
-  { id: 'mozz',    name: 'Mozza-\nrella',       price: 80,  base: 'mozz'  },
-  { id: 'mozz_p',  name: 'Mozz\n+ Papa',        price: 85,  base: 'mozz'  },
-  { id: 'mitad',   name: 'Mitad\ny Mitad',      price: 80,  base: 'mitad' },
-  { id: 'mitad_p', name: 'Mitad\n+ Papa',       price: 85,  base: 'mitad' },
-  { id: 'agua_maracuya',  name: 'Maracuyá',       price: 30,  base: 'agua'  },
-  { id: 'agua_naranja',   name: 'Naranja',        price: 30,  base: 'agua'  },
-  { id: 'agua_pepino',    name: 'Pepino\nc/Limón', price: 30,  base: 'agua'  },
-  { id: 'agua_jamaica',   name: 'Jamaica',        price: 30,  base: 'agua'  },
-  { id: 'agua_horchata',  name: 'Horchata',       price: 30,  base: 'agua'  },
-  { id: 'agua_tamarindo', name: 'Tamarindo',      price: 30,  base: 'agua'  },
+  { id: 'res',     name: 'Salchicha\nde Res',  price: 80,  base: 'res',   key: '1' },
+  { id: 'res_p',   name: 'Res\n+ Papa',        price: 85,  base: 'res',   key: '2' },
+  { id: 'mozz',    name: 'Mozza-\nrella',       price: 80,  base: 'mozz',  key: '3' },
+  { id: 'mozz_p',  name: 'Mozz\n+ Papa',        price: 85,  base: 'mozz',  key: '4' },
+  { id: 'mitad',   name: 'Mitad\ny Mitad',      price: 80,  base: 'mitad', key: '5' },
+  { id: 'mitad_p', name: 'Mitad\n+ Papa',       price: 85,  base: 'mitad', key: '6' },
+  { id: 'agua_maracuya',  name: 'Maracuyá',        price: 30,  base: 'agua',  key: '7' },
+  { id: 'agua_naranja',   name: 'Naranja',         price: 30,  base: 'agua',  key: '8' },
+  { id: 'agua_pepino',    name: 'Pepino\nc/Limón', price: 30,  base: 'agua',  key: '9' },
+  { id: 'agua_jamaica',   name: 'Jamaica',         price: 30,  base: 'agua',  key: '0' },
+  { id: 'agua_horchata',  name: 'Horchata',        price: 30,  base: 'agua',  key: '*' },
+  { id: 'agua_tamarindo', name: 'Tamarindo',       price: 30,  base: 'agua',  key: '/' },
 ];
 
 var STOCK_DEF = {
@@ -1375,7 +1386,8 @@ function fmtDateFull(str) {
 var selectedPay = 'efectivo';
 var sales = loadSales();
 var stock = getStock();
-var cart  = {}; // { productId: quantity }
+var cart        = {}; // { productId: quantity }
+var cartHistory = []; // productId stack for undo
 
 /* ── DATE CHIP ─────────────────────────── */
 (function() {
@@ -1449,7 +1461,8 @@ document.querySelectorAll('.tab-btn').forEach(function(btn){
     btn.innerHTML =
       '<span class="p-name">' + p.name.replace('\n','<br>') + '</span>' +
       '<span class="p-price">$' + p.price + '</span>' +
-      '<span class="p-badge" id="badge-' + p.id + '">1</span>';
+      '<span class="p-badge" id="badge-' + p.id + '">1</span>' +
+      '<span class="p-key">' + p.key + '</span>';
     btn.addEventListener('click', function(){ addToCart(p.id); });
     grid.appendChild(btn);
   });
@@ -1468,6 +1481,7 @@ function cartItemCount() {
 
 function addToCart(productId) {
   cart[productId] = (cart[productId] || 0) + 1;
+  cartHistory.push(productId);
   renderCartBar();
   var btn = document.querySelector('[data-id="' + productId + '"]');
   if (btn) {
@@ -1491,8 +1505,25 @@ function renderCartBar() {
   document.getElementById('cartTotal').textContent  = '$' + total.toLocaleString('es-MX');
 }
 
+function removeLastFromCart() {
+  if (!cartHistory.length) return;
+  var id = cartHistory.pop();
+  cart[id]--;
+  var badge = document.getElementById('badge-' + id);
+  if (cart[id] <= 0) {
+    delete cart[id];
+    var btn = document.querySelector('[data-id="' + id + '"]');
+    if (btn) { btn.classList.remove('in-cart'); }
+    if (badge) badge.textContent = '1';
+  } else {
+    if (badge) badge.textContent = cart[id];
+  }
+  renderCartBar();
+}
+
 function clearCart() {
   cart = {};
+  cartHistory = [];
   PRODUCTS.forEach(function(p){
     var btn = document.querySelector('[data-id="' + p.id + '"]');
     if (btn) {
@@ -2008,6 +2039,81 @@ function renderProdCosts(costs, ranchPorPorcion) {
     list.appendChild(card);
   });
 }
+
+/* ── NUMPAD KEYBOARD SUPPORT ───────────── */
+var NUMPAD_MAP = {};
+PRODUCTS.forEach(function(p){ if (p.key) NUMPAD_MAP[p.key] = p.id; });
+var BILL_KEYS = { '1':20, '2':50, '3':100, '4':200, '5':500 };
+
+document.addEventListener('keydown', function(e) {
+  resetIdle();
+  var key  = e.key;
+  var code = e.code;
+
+  // ── PIN gate ──
+  if (!document.getElementById('pinGate').classList.contains('hide')) {
+    if (key >= '0' && key <= '9') {
+      var k = document.querySelector('.pin-key[data-n="' + key + '"]');
+      if (k) k.click();
+      e.preventDefault();
+    } else if (key === 'Backspace' || code === 'NumpadDecimal') {
+      document.getElementById('pinDel').click();
+      e.preventDefault();
+    }
+    return;
+  }
+
+  // ── Sell sheet ──
+  if (document.getElementById('sellOverlay').classList.contains('show')) {
+    if (key === 'Escape') {
+      document.getElementById('sellOverlay').classList.remove('show');
+      e.preventDefault();
+    } else if ((key === 'Enter' || code === 'NumpadEnter' || key === '+' || code === 'NumpadAdd')) {
+      var cb = document.getElementById('sellConfirmBtn');
+      if (!cb.disabled) cb.click();
+      e.preventDefault();
+    } else if (selectedPay === 'efectivo' && BILL_KEYS[key]) {
+      var bb = document.querySelector('.bill-btn[data-bill="' + BILL_KEYS[key] + '"]');
+      if (bb) bb.click();
+      e.preventDefault();
+    }
+    return;
+  }
+
+  // ── Venta tab ──
+  var activeBtn = document.querySelector('.tab-btn.active');
+  if (!activeBtn || activeBtn.dataset.tab !== 'venta') return;
+
+  var normKey = (code === 'NumpadDivide') ? '/' : (code === 'NumpadMultiply') ? '*' : key;
+  if (NUMPAD_MAP[normKey]) {
+    addToCart(NUMPAD_MAP[normKey]);
+    e.preventDefault();
+  } else if (key === 'Enter' || code === 'NumpadEnter') {
+    if (cartItemCount() > 0) openSellSheet();
+    e.preventDefault();
+  } else if (key === 'Backspace') {
+    removeLastFromCart();
+    e.preventDefault();
+  } else if (key === 'Escape' || key === 'Delete') {
+    clearCart();
+    e.preventDefault();
+  }
+});
+
+/* ── IDLE → SCREENSAVER ─────────────────── */
+var idleTimer;
+var IDLE_MS = 3 * 60 * 1000;
+
+function resetIdle() {
+  clearTimeout(idleTimer);
+  idleTimer = setTimeout(function(){
+    window.location.href = 'screensaver.html';
+  }, IDLE_MS);
+}
+
+document.addEventListener('click',      resetIdle);
+document.addEventListener('touchstart', resetIdle, { passive: true });
+resetIdle();
 
 }());
 </script>

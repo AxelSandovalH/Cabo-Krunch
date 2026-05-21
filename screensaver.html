@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Cabo Krunch</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@300;400;500;700&family=Bangers&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --gold:  #C49A3C;
+      --gold-lt: #E2C06A;
+      --black: #070707;
+      --cream: #F0EBE1;
+      --muted: #5A5552;
+    }
+
+    html, body {
+      width: 100%; height: 100%;
+      background: var(--black);
+      overflow: hidden;
+      cursor: none;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── SLIDES ──────────────────────────── */
+    .slides {
+      position: fixed; inset: 0;
+    }
+
+    .slide {
+      position: absolute; inset: 0;
+      opacity: 0;
+      transition: opacity 1.2s ease;
+      display: flex;
+    }
+    .slide.active { opacity: 1; }
+
+    /* ── SLIDE 1 — HERO BRAND ────────────── */
+    .s-brand {
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 0;
+      background: var(--black);
+    }
+    .brand-logo-wrap {
+      width: 200px; height: 200px;
+      border-radius: 50%;
+      overflow: hidden;
+      margin-bottom: 32px;
+      box-shadow: 0 0 80px rgba(196,154,60,0.2);
+    }
+    .brand-logo-wrap img { width: 100%; height: 100%; object-fit: cover; }
+    .brand-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-weight: 300;
+      font-size: clamp(3.5rem, 8vw, 7rem);
+      color: var(--cream);
+      letter-spacing: -0.01em;
+      line-height: 0.9;
+      text-align: center;
+    }
+    .brand-title em { color: var(--gold-lt); display: block; }
+    .brand-sub {
+      margin-top: 20px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: clamp(0.65rem, 1.4vw, 1rem);
+      font-weight: 500;
+      letter-spacing: 0.45em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .brand-rule {
+      width: 48px; height: 1px;
+      background: var(--gold);
+      margin: 24px auto 20px;
+      opacity: 0.5;
+    }
+    .brand-hours {
+      font-family: 'DM Sans', sans-serif;
+      font-size: clamp(0.6rem, 1.2vw, 0.85rem);
+      font-weight: 400;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+
+    /* ── SLIDE 2-5 — PRODUCT ─────────────── */
+    .s-product {
+      background: var(--black);
+    }
+    .prod-photo {
+      width: 55%;
+      flex-shrink: 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .prod-photo img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+    .prod-photo::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(to right, transparent 60%, var(--black));
+    }
+    .prod-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 60px 60px 60px 40px;
+    }
+    .prod-eyebrow {
+      font-family: 'DM Sans', sans-serif;
+      font-size: clamp(0.55rem, 1vw, 0.72rem);
+      font-weight: 600;
+      letter-spacing: 0.45em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 16px;
+    }
+    .prod-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-weight: 300;
+      font-size: clamp(2.8rem, 6vw, 5.5rem);
+      color: var(--cream);
+      line-height: 0.92;
+      letter-spacing: -0.01em;
+      margin-bottom: 24px;
+    }
+    .prod-desc {
+      font-family: 'DM Sans', sans-serif;
+      font-size: clamp(0.7rem, 1.3vw, 0.95rem);
+      font-weight: 300;
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 360px;
+      margin-bottom: 32px;
+    }
+    .prod-price {
+      font-family: 'DM Sans', sans-serif;
+      font-size: clamp(2rem, 4.5vw, 3.8rem);
+      font-weight: 700;
+      color: var(--gold);
+      letter-spacing: -0.03em;
+      line-height: 1;
+    }
+    .prod-price span {
+      font-size: 0.38em;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      vertical-align: super;
+    }
+
+    /* ── SLIDE 6 — PRICES ────────────────── */
+    .s-prices {
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      background: var(--black);
+      padding: 40px 80px;
+      gap: 0;
+    }
+    .prices-eyebrow {
+      font-family: 'DM Sans', sans-serif;
+      font-size: clamp(0.52rem, 0.9vw, 0.68rem);
+      font-weight: 600;
+      letter-spacing: 0.45em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 24px;
+    }
+    .prices-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px 48px;
+      width: 100%;
+      max-width: 760px;
+      margin-bottom: 36px;
+    }
+    .price-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(240,235,225,0.06);
+    }
+    .price-name {
+      font-family: 'DM Sans', sans-serif;
+      font-size: clamp(0.78rem, 1.5vw, 1.05rem);
+      font-weight: 400;
+      color: var(--cream);
+    }
+    .price-val {
+      font-family: 'DM Sans', sans-serif;
+      font-size: clamp(0.88rem, 1.6vw, 1.15rem);
+      font-weight: 700;
+      color: var(--gold);
+      white-space: nowrap;
+    }
+    .prices-cta {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: clamp(1.8rem, 3.5vw, 3rem);
+      font-weight: 300;
+      color: var(--cream);
+      letter-spacing: 0.02em;
+    }
+    .prices-cta em { color: var(--gold-lt); font-style: italic; }
+
+    /* ── CLOCK ───────────────────────────── */
+    .clock {
+      position: fixed;
+      top: 28px; right: 36px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: clamp(0.9rem, 1.8vw, 1.3rem);
+      font-weight: 300;
+      color: rgba(90,85,82,0.7);
+      letter-spacing: 0.08em;
+      z-index: 100;
+      pointer-events: none;
+    }
+
+    /* ── GOLD LINE BOTTOM ────────────────── */
+    .bottom-line {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(to right, transparent, var(--gold), transparent);
+      opacity: 0.3;
+      z-index: 100;
+    }
+
+    /* ── PROGRESS DOTS ───────────────────── */
+    .dots {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 6px;
+      z-index: 100;
+    }
+    .dot {
+      width: 4px; height: 4px;
+      border-radius: 50%;
+      background: var(--muted);
+      transition: background .3s, transform .3s;
+    }
+    .dot.active {
+      background: var(--gold);
+      transform: scale(1.4);
+    }
+  </style>
+</head>
+<body>
+
+<div class="clock" id="clock"></div>
+<div class="bottom-line"></div>
+
+<div class="slides" id="slides">
+
+  <!-- SLIDE 1: Brand -->
+  <div class="slide s-brand active" data-index="0">
+    <div class="brand-logo-wrap">
+      <img src="img/logo.jpg" alt="Cabo Krunch">
+    </div>
+    <div class="brand-title">Cabo<em>Krunch</em></div>
+    <div class="brand-sub">Corn Dogs Artesanales</div>
+    <div class="brand-rule"></div>
+    <div class="brand-hours">Lun – Vie &nbsp;·&nbsp; 6 – 11 PM &nbsp;·&nbsp; Cabo San Lucas</div>
+  </div>
+
+  <!-- SLIDE 2: Salchicha de Res -->
+  <div class="slide s-product" data-index="1">
+    <div class="prod-photo">
+      <img src="img/banderillaSalchicha.jpg" alt="Salchicha de Res">
+    </div>
+    <div class="prod-info">
+      <div class="prod-eyebrow">Corn Dog Artesanal</div>
+      <div class="prod-name">Salchicha<br>de Res</div>
+      <div class="prod-desc">Salchicha de res envuelta en masa de pancake artesanal, frita a la perfección. Con mostaza y ketchup.</div>
+      <div class="prod-price"><span>$</span>80</div>
+    </div>
+  </div>
+
+  <!-- SLIDE 3: Mozzarella -->
+  <div class="slide s-product" data-index="2">
+    <div class="prod-photo">
+      <img src="img/banderillaQueso.jpg" alt="Mozzarella">
+    </div>
+    <div class="prod-info">
+      <div class="prod-eyebrow">Corn Dog Artesanal</div>
+      <div class="prod-name">Mozza-<br>rella</div>
+      <div class="prod-desc">Barra de queso mozzarella en masa artesanal, con ese jalón de queso que todos aman.</div>
+      <div class="prod-price"><span>$</span>80</div>
+    </div>
+  </div>
+
+  <!-- SLIDE 4: Mitad y Mitad -->
+  <div class="slide s-product" data-index="3">
+    <div class="prod-photo">
+      <img src="img/banderillaMitad.png" alt="Mitad y Mitad">
+    </div>
+    <div class="prod-info">
+      <div class="prod-eyebrow">Lo mejor de dos mundos</div>
+      <div class="prod-name">Mitad<br>y Mitad</div>
+      <div class="prod-desc">½ salchicha de res + ½ mozzarella. Para los que no se deciden — y tienen razón.</div>
+      <div class="prod-price"><span>$</span>80</div>
+    </div>
+  </div>
+
+  <!-- SLIDE 5: Con Papa -->
+  <div class="slide s-product" data-index="4">
+    <div class="prod-photo">
+      <img src="img/conPapa.png" alt="Con Papa">
+    </div>
+    <div class="prod-info">
+      <div class="prod-eyebrow">La versión completa</div>
+      <div class="prod-name">Con<br>Papa</div>
+      <div class="prod-desc">Cualquier corn dog + papas fritas crujientes. La combinación favorita de los clientes.</div>
+      <div class="prod-price"><span>$</span>85 <span style="font-size:0.55em;letter-spacing:0.08em;color:var(--muted)">– 90</span></div>
+    </div>
+  </div>
+
+  <!-- SLIDE 6: Precios -->
+  <div class="slide s-prices" data-index="5">
+    <div class="prices-eyebrow">Menú completo</div>
+    <div class="prices-grid">
+      <div class="price-row"><span class="price-name">Salchicha de Res</span><span class="price-val">$80</span></div>
+      <div class="price-row"><span class="price-name">Res + Papa</span><span class="price-val">$85</span></div>
+      <div class="price-row"><span class="price-name">Mozzarella</span><span class="price-val">$80</span></div>
+      <div class="price-row"><span class="price-name">Mozz + Papa</span><span class="price-val">$85</span></div>
+      <div class="price-row"><span class="price-name">Mitad y Mitad</span><span class="price-val">$80</span></div>
+      <div class="price-row"><span class="price-name">Mitad + Papa</span><span class="price-val">$85</span></div>
+      <div class="price-row"><span class="price-name">Aguas Frescas</span><span class="price-val">$30</span></div>
+      <div class="price-row"><span class="price-name">Maracuyá · Naranja · Pepino</span><span class="price-val" style="color:var(--muted)">c/u</span></div>
+    </div>
+    <div class="prices-cta">Pídenos <em>ahorita</em></div>
+  </div>
+
+</div>
+
+<div class="dots" id="dots"></div>
+
+<script>
+  var TOTAL    = 6;
+  var current  = 0;
+  var slides   = document.querySelectorAll('.slide');
+  var dotsEl   = document.getElementById('dots');
+  var interval;
+
+  // Build dots
+  for (var i = 0; i < TOTAL; i++) {
+    var d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    dotsEl.appendChild(d);
+  }
+
+  function goTo(n) {
+    slides[current].classList.remove('active');
+    dotsEl.children[current].classList.remove('active');
+    current = (n + TOTAL) % TOTAL;
+    slides[current].classList.add('active');
+    dotsEl.children[current].classList.add('active');
+  }
+
+  function next() { goTo(current + 1); }
+
+  interval = setInterval(next, 6000);
+
+  // Clock
+  function updateClock() {
+    var d = new Date();
+    var h = d.getHours(), m = d.getMinutes();
+    document.getElementById('clock').textContent =
+      (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m;
+  }
+  updateClock();
+  setInterval(updateClock, 10000);
+
+  // Any key / click → back to POS
+  function returnToPOS() { window.location.href = 'sistema.html'; }
+  document.addEventListener('keydown', returnToPOS);
+  document.addEventListener('click',   returnToPOS);
+  document.addEventListener('touchstart', returnToPOS);
+</script>
+
+</body>
+</html>
