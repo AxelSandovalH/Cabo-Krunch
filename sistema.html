@@ -208,6 +208,18 @@
     }
     .prod-btn:active { transform: scale(0.96); background: #181818; }
     .prod-btn.flash  { background: var(--gold-dim); border-color: var(--border-g); }
+    .prod-btn.holding::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: rgba(239,68,68,0.12);
+      border-radius: 10px;
+      animation: holdFill .38s linear forwards;
+      pointer-events: none;
+    }
+    @keyframes holdFill {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
     .prod-btn .p-name {
       font-size: 0.78rem;
       font-weight: 600;
@@ -1465,20 +1477,44 @@ document.querySelectorAll('.tab-btn').forEach(function(btn){
       '<span class="p-price">$' + p.price + '</span>' +
       '<span class="p-badge" id="badge-' + p.id + '">1</span>' +
       '<span class="p-key">' + p.key + '</span>';
-    // Single tap = add · Double tap = subtract
+    // Tap = add instant · Hold 380ms = subtract
     (function(pid){
-      var timer = null;
-      btn.addEventListener('click', function(){
-        if (timer) {
-          clearTimeout(timer);
-          timer = null;
+      var holdTimer  = null;
+      var didHold    = false;
+      var touchUsed  = false;
+
+      function startHold(el) {
+        didHold = false;
+        el.classList.add('holding');
+        holdTimer = setTimeout(function(){
+          didHold = true;
+          el.classList.remove('holding');
           removeFromCartDirect(pid);
-        } else {
-          timer = setTimeout(function(){
-            timer = null;
-            addToCart(pid);
-          }, 260);
-        }
+        }, 380);
+      }
+      function endHold(el) {
+        clearTimeout(holdTimer);
+        el.classList.remove('holding');
+      }
+
+      btn.addEventListener('touchstart', function(){
+        touchUsed = true;
+        startHold(btn);
+      }, { passive: true });
+      btn.addEventListener('touchend', function(){
+        endHold(btn);
+        if (!didHold) addToCart(pid);
+        didHold = false;
+      });
+      btn.addEventListener('touchmove', function(){
+        endHold(btn);
+        didHold = true; // cancel add on scroll
+      }, { passive: true });
+
+      // Mouse / numpad fallback
+      btn.addEventListener('click', function(){
+        if (touchUsed) { touchUsed = false; return; }
+        addToCart(pid);
       });
     }(p.id));
     grid.appendChild(btn);
