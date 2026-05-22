@@ -638,6 +638,17 @@ ul { list-style: none; }
   color: var(--muted);
   letter-spacing: 0.15em;
 }
+.footer-dev {
+  font-size: 0.52rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: lowercase;
+  color: var(--muted);
+  text-decoration: none;
+  opacity: 0.45;
+  transition: opacity .2s, color .2s;
+}
+.footer-dev:hover { opacity: 1; color: var(--cream); }
 
 
 /* ══════════════════════════════════════════════════
