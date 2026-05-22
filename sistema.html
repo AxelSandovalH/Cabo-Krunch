@@ -929,12 +929,20 @@
       color: #000;
       font-size: 0.58rem;
       font-weight: 700;
-      width: 18px; height: 18px;
+      width: 20px; height: 20px;
       border-radius: 50%;
       align-items: center;
       justify-content: center;
       line-height: 1;
+      cursor: pointer;
+      border: none;
+      padding: 0;
+      font-family: 'DM Sans', sans-serif;
+      transition: background .12s, transform .1s;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
     }
+    .prod-btn .p-badge:active { background: #ef4444; transform: scale(0.88); }
     .prod-btn.in-cart { border-color: var(--border-g); background: #141414; }
     .prod-btn.in-cart .p-badge { display: flex; }
 
@@ -1006,7 +1014,7 @@
     }
     .sell-bills {
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
+      grid-template-columns: repeat(3, 1fr);
       gap: 6px;
       margin-bottom: 10px;
     }
@@ -1461,9 +1469,17 @@ document.querySelectorAll('.tab-btn').forEach(function(btn){
     btn.innerHTML =
       '<span class="p-name">' + p.name.replace('\n','<br>') + '</span>' +
       '<span class="p-price">$' + p.price + '</span>' +
-      '<span class="p-badge" id="badge-' + p.id + '">1</span>' +
+      '<button class="p-badge" id="badge-' + p.id + '" aria-label="Quitar uno">1</button>' +
       '<span class="p-key">' + p.key + '</span>';
     btn.addEventListener('click', function(){ addToCart(p.id); });
+    // Badge tap = subtract one
+    (function(pid){
+      var badge = btn.querySelector('.p-badge');
+      badge.addEventListener('click', function(e){
+        e.stopPropagation();
+        removeFromCartDirect(pid);
+      });
+    }(p.id));
     grid.appendChild(btn);
   });
 }());
@@ -1508,12 +1524,21 @@ function renderCartBar() {
 function removeLastFromCart() {
   if (!cartHistory.length) return;
   var id = cartHistory.pop();
+  removeFromCartDirect(id, true);
+}
+
+function removeFromCartDirect(id, fromHistory) {
+  if (!cart[id]) return;
   cart[id]--;
+  if (!fromHistory) {
+    var idx = cartHistory.lastIndexOf(id);
+    if (idx !== -1) cartHistory.splice(idx, 1);
+  }
   var badge = document.getElementById('badge-' + id);
   if (cart[id] <= 0) {
     delete cart[id];
     var btn = document.querySelector('[data-id="' + id + '"]');
-    if (btn) { btn.classList.remove('in-cart'); }
+    if (btn) btn.classList.remove('in-cart');
     if (badge) badge.textContent = '1';
   } else {
     if (badge) badge.textContent = cart[id];
@@ -1539,7 +1564,7 @@ document.getElementById('cartClearBtn').addEventListener('click', function(){ cl
 document.getElementById('cartSellBtn').addEventListener('click', function(){ openSellSheet(); });
 
 /* ── SELL SHEET ────────────────────────── */
-var BILLS = [20, 50, 100, 200, 500];
+var BILLS = [20, 50, 100, 200, 500, 1000];
 var selectedBill = 0;
 
 function openSellSheet() {
@@ -1656,26 +1681,41 @@ document.querySelectorAll('#mainPayRow .pay-btn').forEach(function(btn){
 document.getElementById('undoBtn').addEventListener('click', function(){
   var todaySales = sales.filter(function(s){ return s.date === todayStr(); });
   if (!todaySales.length) return;
-  var last = todaySales[todaySales.length - 1];
-  var prod = PRODUCTS.find(function(p){ return p.id === last.product; });
-  var payLabel = PAYMENTS.find(function(p){ return p.id === last.payment; });
-  showModal(
-    'Deshacer venta',
-    (prod ? prod.name.replace('\n',' ') : last.product) + '  ·  $' + last.price + '  ·  ' + (payLabel ? payLabel.label : last.payment) + '\n' +
-    new Date(last.ts).toLocaleTimeString('es-MX', { hour:'2-digit', minute:'2-digit' }),
-    function() {
-      if (prod) {
-        var recipe = RECIPE[prod.base];
-        if (recipe) { for (var ing in recipe) { if (stock[ing] !== undefined) stock[ing] += recipe[ing]; } saveStock(stock); }
+
+  // Find the ts of the last group
+  var lastTs = todaySales[todaySales.length - 1].ts;
+  var group  = todaySales.filter(function(s){ return s.ts === lastTs; });
+
+  var groupTotal = group.reduce(function(a,s){ return a + s.price; }, 0);
+  var payLabel   = PAYMENTS.find(function(p){ return p.id === group[0].payment; });
+  var time       = new Date(lastTs).toLocaleTimeString('es-MX', { hour:'2-digit', minute:'2-digit' });
+
+  // Build summary line per product
+  var summary = {};
+  group.forEach(function(s){
+    var p = PRODUCTS.find(function(p){ return p.id === s.product; });
+    var name = p ? p.name.replace('\n',' ') : s.product;
+    summary[name] = (summary[name] || 0) + 1;
+  });
+  var lines = Object.keys(summary).map(function(n){ return '×' + summary[n] + '  ' + n; }).join('\n');
+  var bodyText = lines + '\n$' + groupTotal.toLocaleString('es-MX') + '  ·  ' + (payLabel ? payLabel.label : group[0].payment) + '  ·  ' + time;
+
+  showModal('Cancelar pedido', bodyText, function() {
+    group.forEach(function(s){
+      var p = PRODUCTS.find(function(p){ return p.id === s.product; });
+      if (p) {
+        var recipe = RECIPE[p.base];
+        if (recipe) for (var ing in recipe) { if (stock[ing] !== undefined) stock[ing] += recipe[ing]; }
       }
-      sales.splice(sales.indexOf(last), 1);
-      saveSales(sales);
-      var remaining = sales.filter(function(s){ return s.date === todayStr(); });
-      document.getElementById('undoBtn').disabled = !remaining.length;
-      renderTodaySummary();
-      showToast('Venta eliminada');
-    }
-  );
+      sales.splice(sales.indexOf(s), 1);
+    });
+    saveStock(stock);
+    saveSales(sales);
+    var remaining = sales.filter(function(s){ return s.date === todayStr(); });
+    document.getElementById('undoBtn').disabled = !remaining.length;
+    renderTodaySummary();
+    showToast(group.length + (group.length===1?' venta':' ventas') + ' canceladas');
+  });
 });
 
 /* ── TODAY SUMMARY ─────────────────────── */
