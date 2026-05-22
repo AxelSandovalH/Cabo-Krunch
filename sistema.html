@@ -924,25 +924,19 @@
     .prod-btn .p-badge {
       display: none;
       position: absolute;
-      top: 8px; right: 8px;
+      top: 7px; right: 7px;
       background: var(--gold);
       color: #000;
-      font-size: 0.58rem;
+      font-size: 0.75rem;
       font-weight: 700;
-      width: 20px; height: 20px;
-      border-radius: 50%;
+      min-width: 22px; height: 22px;
+      padding: 0 5px;
+      border-radius: 11px;
       align-items: center;
       justify-content: center;
       line-height: 1;
-      cursor: pointer;
-      border: none;
-      padding: 0;
-      font-family: 'DM Sans', sans-serif;
-      transition: background .12s, transform .1s;
-      -webkit-tap-highlight-color: transparent;
-      touch-action: manipulation;
+      pointer-events: none;
     }
-    .prod-btn .p-badge:active { background: #ef4444; transform: scale(0.88); }
     .prod-btn.in-cart { border-color: var(--border-g); background: #141414; }
     .prod-btn.in-cart .p-badge { display: flex; }
 
@@ -1469,15 +1463,22 @@ document.querySelectorAll('.tab-btn').forEach(function(btn){
     btn.innerHTML =
       '<span class="p-name">' + p.name.replace('\n','<br>') + '</span>' +
       '<span class="p-price">$' + p.price + '</span>' +
-      '<button class="p-badge" id="badge-' + p.id + '" aria-label="Quitar uno">1</button>' +
+      '<span class="p-badge" id="badge-' + p.id + '">1</span>' +
       '<span class="p-key">' + p.key + '</span>';
-    btn.addEventListener('click', function(){ addToCart(p.id); });
-    // Badge tap = subtract one
+    // Single tap = add · Double tap = subtract
     (function(pid){
-      var badge = btn.querySelector('.p-badge');
-      badge.addEventListener('click', function(e){
-        e.stopPropagation();
-        removeFromCartDirect(pid);
+      var timer = null;
+      btn.addEventListener('click', function(){
+        if (timer) {
+          clearTimeout(timer);
+          timer = null;
+          removeFromCartDirect(pid);
+        } else {
+          timer = setTimeout(function(){
+            timer = null;
+            addToCart(pid);
+          }, 260);
+        }
       });
     }(p.id));
     grid.appendChild(btn);
