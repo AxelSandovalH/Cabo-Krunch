@@ -2177,20 +2177,24 @@ document.addEventListener('keydown', function(e) {
   }
 });
 
-/* ── IDLE → SCREENSAVER ─────────────────── */
+/* ── IDLE → SCREENSAVER (solo modo kiosk) ── */
 var idleTimer;
-var IDLE_MS = 3 * 60 * 1000;
+var IDLE_MS   = 3 * 60 * 1000;
+var isKiosk   = new URLSearchParams(window.location.search).get('kiosk') === '1';
 
 function resetIdle() {
+  if (!isKiosk) return;
   clearTimeout(idleTimer);
   idleTimer = setTimeout(function(){
     window.location.href = 'screensaver.html';
   }, IDLE_MS);
 }
 
-document.addEventListener('click',      resetIdle);
-document.addEventListener('touchstart', resetIdle, { passive: true });
-resetIdle();
+if (isKiosk) {
+  document.addEventListener('click',      resetIdle);
+  document.addEventListener('touchstart', resetIdle, { passive: true });
+  resetIdle();
+}
 
 }());
 </script>
