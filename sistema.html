@@ -1159,6 +1159,7 @@
       white-space: nowrap;
     }
     .batch-set-btn:active { opacity: 0.7; }
+    .batch-set-btn { touch-action: manipulation; }
 
     /* batch input sheet */
     .batch-overlay {
@@ -2827,6 +2828,17 @@ document.addEventListener('keydown', function(e) {
     }
     return;
   }
+
+  // ── Batch overlay — let all keys through to the input ──
+  if (document.getElementById('batchOverlay').classList.contains('show')) {
+    if (key === 'Escape') document.getElementById('batchOverlay').classList.remove('show');
+    else if (key === 'Enter' || code === 'NumpadEnter') document.getElementById('batchSaveBtn').click();
+    return;
+  }
+
+  // ── Any other input focused — don't hijack ──
+  var ae = document.activeElement;
+  if (ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA') && key !== 'Escape') return;
 
   // ── Sell sheet ──
   if (document.getElementById('sellOverlay').classList.contains('show')) {
