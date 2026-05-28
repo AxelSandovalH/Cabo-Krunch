@@ -1089,6 +1089,125 @@
     }
     .sell-confirm-btn:active { opacity: 0.8; transform: scale(0.98); }
     .sell-confirm-btn:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
+
+    /* ── CHECKLIST / DIARIO ────────────────── */
+    .ops-overview {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 6px;
+    }
+    .ops-bar-wrap {
+      flex: 1;
+      height: 6px;
+      background: var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .ops-bar {
+      height: 100%;
+      background: var(--gold);
+      border-radius: 3px;
+      transition: width .35s cubic-bezier(0.23,1,0.32,1);
+      width: 0%;
+    }
+    .ops-bar-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--gold);
+      white-space: nowrap;
+      min-width: 32px;
+      text-align: right;
+    }
+    .ops-section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 6px;
+      transition: border-color .2s;
+    }
+    .ops-section.done { border-color: rgba(34,197,94,0.22); }
+    .ops-section-hd {
+      display: flex;
+      align-items: center;
+      padding: 13px 14px;
+      gap: 10px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    .ops-section-name {
+      flex: 1;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--cream);
+    }
+    .ops-section-prog {
+      font-size: 0.6rem;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+      transition: color .2s;
+    }
+    .ops-section.done .ops-section-prog { color: var(--green); }
+    .ops-section-arrow {
+      font-size: 0.58rem;
+      color: var(--muted);
+      transition: transform .2s;
+      margin-left: 4px;
+    }
+    .ops-section.open .ops-section-arrow { transform: rotate(180deg); }
+    .ops-section-body {
+      display: none;
+      padding: 0 14px 8px;
+      border-top: 1px solid var(--border);
+    }
+    .ops-section.open .ops-section-body { display: block; }
+    .ops-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    .ops-item:last-child { border-bottom: none; }
+    .ops-check {
+      width: 22px; height: 22px;
+      border-radius: 6px;
+      border: 1.5px solid var(--muted);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: transparent;
+      transition: background .15s, border-color .15s, color .15s;
+    }
+    .ops-item.checked .ops-check {
+      background: var(--gold);
+      border-color: var(--gold);
+      color: #000;
+    }
+    .ops-item-text {
+      font-size: 0.8rem;
+      color: var(--cream);
+      line-height: 1.35;
+      transition: color .15s;
+    }
+    .ops-item.checked .ops-item-text {
+      color: var(--muted);
+      text-decoration: line-through;
+      text-decoration-color: var(--muted);
+    }
   </style>
 </head>
 <body>
@@ -1134,6 +1253,7 @@
   <button class="tab-btn"        data-tab="stock">Inventario</button>
   <button class="tab-btn"        data-tab="historial">Historial</button>
   <button class="tab-btn"        data-tab="costos">Costos</button>
+  <button class="tab-btn"        data-tab="ops">Diario</button>
 </nav>
 
 <main class="content">
@@ -1246,6 +1366,24 @@
 
     <div class="sec-label">Margen por producto</div>
     <div id="costProdList"></div>
+
+  </div>
+
+  <!-- ═══ DIARIO / OPS ═══ -->
+  <div class="tab-panel" id="tab-ops">
+
+    <div class="sec-label">Progreso del día</div>
+    <div class="ops-overview">
+      <div class="ops-bar-wrap"><div class="ops-bar" id="opsProgressBar"></div></div>
+      <div class="ops-bar-label" id="opsProgressLabel">0/0</div>
+    </div>
+
+    <div class="sec-label">Checklist</div>
+    <div id="opsContainer"></div>
+
+    <div class="stock-actions" style="margin-top:8px;">
+      <button class="action-btn" id="opsResetBtn">Reiniciar checklist</button>
+    </div>
 
   </div>
 
@@ -1398,60 +1536,64 @@ function sbSyncSales(salesArr) {
   var rows = salesArr.map(function(s){
     return { id: String(s.id), ts: s.ts, date: s.date, product: s.product, price: s.price, payment: s.payment };
   });
-  _sb.from('sales').upsert(rows).then(function(res){
-    if (res.error) console.warn('[supa] sales sync:', res.error.message);
-  });
+  _sb.from('sales').upsert(rows)
+    .then(function(res){ if (res.error) console.warn('[supa] sales sync:', res.error.message); })
+    .catch(function(){}); // silent on network failure
 }
 
 function sbDeleteSales(ids) {
   if (!_sb || !ids.length) return;
-  _sb.from('sales').delete().in('id', ids).then(function(res){
-    if (res.error) console.warn('[supa] sales delete:', res.error.message);
-  });
+  _sb.from('sales').delete().in('id', ids)
+    .then(function(res){ if (res.error) console.warn('[supa] sales delete:', res.error.message); })
+    .catch(function(){});
 }
 
 function sbSyncStock(stockObj) {
   if (!_sb) return;
   var rows = Object.keys(stockObj).map(function(k){ return { key: k, quantity: stockObj[k] }; });
   if (!rows.length) return;
-  _sb.from('stock').upsert(rows).then(function(res){
-    if (res.error) console.warn('[supa] stock sync:', res.error.message);
-  });
+  _sb.from('stock').upsert(rows)
+    .then(function(res){ if (res.error) console.warn('[supa] stock sync:', res.error.message); })
+    .catch(function(){});
 }
 
 function sbFetchAndMerge() {
   if (!_sb) return;
   /* --- merge sales --- */
-  _sb.from('sales').select('*').then(function(res){
-    if (res.error || !res.data || !res.data.length) return;
-    var local   = loadSales();
-    var localMap = {};
-    local.forEach(function(s){ localMap[String(s.id)] = true; });
-    var added = 0;
-    res.data.forEach(function(s){
-      if (!localMap[String(s.id)]) {
-        local.push({ id: s.id, ts: s.ts, date: s.date, product: s.product, price: s.price, payment: s.payment });
-        added++;
+  _sb.from('sales').select('*')
+    .then(function(res){
+      if (res.error || !res.data || !res.data.length) return;
+      var local    = loadSales();
+      var localMap = {};
+      local.forEach(function(s){ localMap[String(s.id)] = true; });
+      var added = 0;
+      res.data.forEach(function(s){
+        if (!localMap[String(s.id)]) {
+          local.push({ id: s.id, ts: s.ts, date: s.date, product: s.product, price: s.price, payment: s.payment });
+          added++;
+        }
+      });
+      if (added) {
+        localStorage.setItem('ck_sales', JSON.stringify(local));
+        sales = local;
+        renderTodaySummary();
+        var cnt = sales.filter(function(s){ return s.date === todayStr(); }).length;
+        if (cnt) document.getElementById('undoBtn').disabled = false;
       }
-    });
-    if (added) {
-      localStorage.setItem('ck_sales', JSON.stringify(local));
-      sales = local;
-      renderTodaySummary();
-      var cnt = sales.filter(function(s){ return s.date === todayStr(); }).length;
-      if (cnt) document.getElementById('undoBtn').disabled = false;
-    }
-  });
+    })
+    .catch(function(){});
   /* --- merge stock (only if local is empty) --- */
   var localStock = loadStock();
   if (!localStock) {
-    _sb.from('stock').select('*').then(function(res){
-      if (res.error || !res.data || !res.data.length) return;
-      var obj = {};
-      res.data.forEach(function(r){ obj[r.key] = r.quantity; });
-      localStorage.setItem('ck_stock', JSON.stringify(obj));
-      stock = getStock();
-    });
+    _sb.from('stock').select('*')
+      .then(function(res){
+        if (res.error || !res.data || !res.data.length) return;
+        var obj = {};
+        res.data.forEach(function(r){ obj[r.key] = r.quantity; });
+        localStorage.setItem('ck_stock', JSON.stringify(obj));
+        stock = getStock();
+      })
+      .catch(function(){});
   }
 }
 
@@ -1531,6 +1673,7 @@ document.querySelectorAll('.tab-btn').forEach(function(btn){
     if (id === 'historial') renderHistorial();
     if (id === 'stock')     renderStock();
     if (id === 'costos')    renderCostos();
+    if (id === 'ops')       renderChecklist();
   });
 });
 
@@ -1894,6 +2037,7 @@ function renderTodaySummary() {
 renderTodaySummary();
 var todayCount = sales.filter(function(s){ return s.date === todayStr(); }).length;
 if (todayCount) document.getElementById('undoBtn').disabled = false;
+updateOpsProgress(loadChecklist());
 sbFetchAndMerge();
 
 /* ── STOCK ─────────────────────────────── */
@@ -2197,6 +2341,156 @@ function renderProdCosts(costs, ranchPorPorcion) {
     list.appendChild(card);
   });
 }
+
+/* ── CHECKLIST / DIARIO ────────────────── */
+var CHECKLIST = [
+  { id: 'limpieza', label: 'Limpieza', items: [
+    { id: 'l1', text: 'Limpiar freidora (cambiar aceite si aplica)' },
+    { id: 'l2', text: 'Limpiar área de trabajo y superficies' },
+    { id: 'l3', text: 'Lavar utensilios y bandejas' },
+    { id: 'l4', text: 'Limpiar pisos' },
+    { id: 'l5', text: 'Revisar y limpiar refrigerador' },
+  ]},
+  { id: 'produccion', label: 'Producción', items: [
+    { id: 'p1', text: 'Preparar masa de banderilla' },
+    { id: 'p2', text: 'Contar y preparar salchichas' },
+    { id: 'p3', text: 'Preparar queso mozzarella' },
+    { id: 'p4', text: 'Preparar aguas frescas' },
+    { id: 'p5', text: 'Revisar y contar palitos (chopsticks)' },
+  ]},
+  { id: 'setup', label: 'Setup', items: [
+    { id: 's1', text: 'Calentar aceite a temperatura correcta' },
+    { id: 's2', text: 'Surtir ingredientes en estación de trabajo' },
+    { id: 's3', text: 'Preparar salsas y condimentos' },
+    { id: 's4', text: 'Verificar que el equipo esté funcionando' },
+    { id: 's5', text: 'Organizar y acomodar la estación' },
+  ]},
+  { id: 'abrir', label: 'Abrir', items: [
+    { id: 'a1', text: 'Poner señalización y letrero exterior' },
+    { id: 'a2', text: 'Confirmar efectivo en caja' },
+    { id: 'a3', text: 'Activar Punto de Venta (POS)' },
+    { id: 'a4', text: 'Tomar foto para redes sociales' },
+  ]},
+  { id: 'software', label: 'Revisar Sistema', items: [
+    { id: 'sw1', text: 'Revisar ventas del día anterior' },
+    { id: 'sw2', text: 'Actualizar stock de ingredientes' },
+    { id: 'sw3', text: 'Verificar sincronización con base de datos' },
+  ]},
+  { id: 'cerrar', label: 'Cerrar', items: [
+    { id: 'c1', text: 'Contar y registrar efectivo del día' },
+    { id: 'c2', text: 'Exportar respaldo de datos' },
+    { id: 'c3', text: 'Limpiar área de trabajo al terminar' },
+    { id: 'c4', text: 'Apagar equipo y POS' },
+    { id: 'c5', text: 'Asegurar y cerrar el local' },
+  ]},
+];
+
+function loadChecklist() {
+  try {
+    var d = JSON.parse(localStorage.getItem('ck_checklist') || 'null');
+    if (!d || d.date !== todayStr()) return { date: todayStr(), checks: {} };
+    return d;
+  } catch(e) { return { date: todayStr(), checks: {} }; }
+}
+function saveChecklist(d) { localStorage.setItem('ck_checklist', JSON.stringify(d)); }
+
+function ckTotalItems() {
+  return CHECKLIST.reduce(function(n, s) { return n + s.items.length; }, 0);
+}
+function ckCheckedCount(data) {
+  return Object.keys(data.checks).filter(function(k) { return data.checks[k]; }).length;
+}
+
+function updateOpsProgress(data) {
+  var total   = ckTotalItems();
+  var checked = ckCheckedCount(data);
+  var pct     = total ? Math.round(checked / total * 100) : 0;
+  document.getElementById('opsProgressBar').style.width   = pct + '%';
+  document.getElementById('opsProgressLabel').textContent = checked + '/' + total;
+}
+
+function renderChecklist() {
+  var data = loadChecklist();
+  var container = document.getElementById('opsContainer');
+
+  // Preserve open state across re-renders
+  var openStates = {};
+  container.querySelectorAll('.ops-section').forEach(function(el) {
+    openStates[el.dataset.sec] = el.classList.contains('open');
+  });
+
+  container.innerHTML = '';
+  updateOpsProgress(data);
+
+  CHECKLIST.forEach(function(sec) {
+    var secChecked = sec.items.filter(function(item) { return data.checks[item.id]; }).length;
+    var secTotal   = sec.items.length;
+    var isDone     = secChecked === secTotal;
+
+    var div = document.createElement('div');
+    div.className    = 'ops-section' + (isDone ? ' done' : '') + (openStates[sec.id] ? ' open' : '');
+    div.dataset.sec  = sec.id;
+
+    var bodyHtml = sec.items.map(function(item) {
+      var ck = !!data.checks[item.id];
+      return '<div class="ops-item' + (ck ? ' checked' : '') + '" data-item="' + item.id + '" data-sec="' + sec.id + '">' +
+        '<div class="ops-check">' + (ck ? '✓' : '') + '</div>' +
+        '<span class="ops-item-text">' + item.text + '</span>' +
+      '</div>';
+    }).join('');
+
+    div.innerHTML =
+      '<div class="ops-section-hd">' +
+        '<span class="ops-section-name">' + sec.label + '</span>' +
+        '<span class="ops-section-prog">' + secChecked + '/' + secTotal + (isDone ? ' ✓' : '') + '</span>' +
+        '<span class="ops-section-arrow">▼</span>' +
+      '</div>' +
+      '<div class="ops-section-body">' + bodyHtml + '</div>';
+
+    // Toggle open/close on header tap
+    div.querySelector('.ops-section-hd').addEventListener('click', function() {
+      div.classList.toggle('open');
+    });
+
+    // Checkbox toggle — in-place, no full re-render
+    div.querySelectorAll('.ops-item').forEach(function(itemEl) {
+      itemEl.addEventListener('click', function() {
+        var itemId  = this.dataset.item;
+        var secId   = this.dataset.sec;
+        var d       = loadChecklist();
+        d.checks[itemId] = !d.checks[itemId];
+        saveChecklist(d);
+
+        // Update this item visually
+        var isNowChecked = d.checks[itemId];
+        itemEl.classList.toggle('checked', isNowChecked);
+        itemEl.querySelector('.ops-check').textContent = isNowChecked ? '✓' : '';
+
+        // Update section header
+        var secDef     = CHECKLIST.find(function(s) { return s.id === secId; });
+        var newSecCk   = secDef.items.filter(function(i) { return d.checks[i.id]; }).length;
+        var newDone    = newSecCk === secDef.items.length;
+        var secEl      = itemEl.closest('.ops-section');
+        secEl.classList.toggle('done', newDone);
+        secEl.querySelector('.ops-section-prog').textContent =
+          newSecCk + '/' + secDef.items.length + (newDone ? ' ✓' : '');
+
+        // Update overall bar
+        updateOpsProgress(d);
+      });
+    });
+
+    container.appendChild(div);
+  });
+}
+
+document.getElementById('opsResetBtn').addEventListener('click', function() {
+  showModal('Reiniciar checklist', 'Borras todos los checks del día de hoy.', function() {
+    saveChecklist({ date: todayStr(), checks: {} });
+    renderChecklist();
+    showToast('Checklist reiniciado');
+  });
+});
 
 /* ── NUMPAD KEYBOARD SUPPORT ───────────── */
 var NUMPAD_MAP = {};
