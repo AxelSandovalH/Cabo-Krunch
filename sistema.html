@@ -13,6 +13,7 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700&family=Bangers&display=swap" rel="stylesheet">
   <link rel="icon" href="img/logo-icon.jpg" type="image/jpeg">
   <link rel="apple-touch-icon" href="img/logo-icon.jpg">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -1381,8 +1382,78 @@ var PAYMENTS = [
 /* ── STORAGE ───────────────────────────── */
 function loadSales() { try { return JSON.parse(localStorage.getItem('ck_sales') || '[]'); } catch(e){ return []; } }
 function loadStock() { try { return JSON.parse(localStorage.getItem('ck_stock') || 'null'); } catch(e){ return null; } }
-function saveSales(d){ localStorage.setItem('ck_sales', JSON.stringify(d)); }
-function saveStock(d){ localStorage.setItem('ck_stock', JSON.stringify(d)); }
+function saveSales(d){ localStorage.setItem('ck_sales', JSON.stringify(d)); sbSyncSales(d); }
+function saveStock(d){ localStorage.setItem('ck_stock', JSON.stringify(d)); sbSyncStock(d); }
+
+/* ── SUPABASE ──────────────────────────── */
+var _sb = (typeof supabase !== 'undefined')
+  ? supabase.createClient(
+      'https://jtwnepiynnwzfnpruoek.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0d25lcGl5bm53emZucHJ1b2VrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2NzE5NjAsImV4cCI6MjA5NTI0Nzk2MH0.qvIUl8DruDOQkcbZSFlSKHPz8RQa04BnOdveTA-BcXA'
+    )
+  : null;
+
+function sbSyncSales(salesArr) {
+  if (!_sb || !salesArr.length) return;
+  var rows = salesArr.map(function(s){
+    return { id: String(s.id), ts: s.ts, date: s.date, product: s.product, price: s.price, payment: s.payment };
+  });
+  _sb.from('sales').upsert(rows).then(function(res){
+    if (res.error) console.warn('[supa] sales sync:', res.error.message);
+  });
+}
+
+function sbDeleteSales(ids) {
+  if (!_sb || !ids.length) return;
+  _sb.from('sales').delete().in('id', ids).then(function(res){
+    if (res.error) console.warn('[supa] sales delete:', res.error.message);
+  });
+}
+
+function sbSyncStock(stockObj) {
+  if (!_sb) return;
+  var rows = Object.keys(stockObj).map(function(k){ return { key: k, quantity: stockObj[k] }; });
+  if (!rows.length) return;
+  _sb.from('stock').upsert(rows).then(function(res){
+    if (res.error) console.warn('[supa] stock sync:', res.error.message);
+  });
+}
+
+function sbFetchAndMerge() {
+  if (!_sb) return;
+  /* --- merge sales --- */
+  _sb.from('sales').select('*').then(function(res){
+    if (res.error || !res.data || !res.data.length) return;
+    var local   = loadSales();
+    var localMap = {};
+    local.forEach(function(s){ localMap[String(s.id)] = true; });
+    var added = 0;
+    res.data.forEach(function(s){
+      if (!localMap[String(s.id)]) {
+        local.push({ id: s.id, ts: s.ts, date: s.date, product: s.product, price: s.price, payment: s.payment });
+        added++;
+      }
+    });
+    if (added) {
+      localStorage.setItem('ck_sales', JSON.stringify(local));
+      sales = local;
+      renderTodaySummary();
+      var cnt = sales.filter(function(s){ return s.date === todayStr(); }).length;
+      if (cnt) document.getElementById('undoBtn').disabled = false;
+    }
+  });
+  /* --- merge stock (only if local is empty) --- */
+  var localStock = loadStock();
+  if (!localStock) {
+    _sb.from('stock').select('*').then(function(res){
+      if (res.error || !res.data || !res.data.length) return;
+      var obj = {};
+      res.data.forEach(function(r){ obj[r.key] = r.quantity; });
+      localStorage.setItem('ck_stock', JSON.stringify(obj));
+      stock = getStock();
+    });
+  }
+}
 
 function getStock() {
   var s = loadStock();
@@ -1745,6 +1816,7 @@ document.getElementById('undoBtn').addEventListener('click', function(){
   var bodyText = lines + '\n$' + groupTotal.toLocaleString('es-MX') + '  ·  ' + (payLabel ? payLabel.label : group[0].payment) + '  ·  ' + time;
 
   showModal('Cancelar pedido', bodyText, function() {
+    var deletedIds = group.map(function(s){ return String(s.id); });
     group.forEach(function(s){
       var p = PRODUCTS.find(function(p){ return p.id === s.product; });
       if (p) {
@@ -1755,6 +1827,7 @@ document.getElementById('undoBtn').addEventListener('click', function(){
     });
     saveStock(stock);
     saveSales(sales);
+    sbDeleteSales(deletedIds);
     var remaining = sales.filter(function(s){ return s.date === todayStr(); });
     document.getElementById('undoBtn').disabled = !remaining.length;
     renderTodaySummary();
@@ -1821,6 +1894,7 @@ function renderTodaySummary() {
 renderTodaySummary();
 var todayCount = sales.filter(function(s){ return s.date === todayStr(); }).length;
 if (todayCount) document.getElementById('undoBtn').disabled = false;
+sbFetchAndMerge();
 
 /* ── STOCK ─────────────────────────────── */
 function renderStock() {
