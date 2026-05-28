@@ -1090,6 +1090,182 @@
     .sell-confirm-btn:active { opacity: 0.8; transform: scale(0.98); }
     .sell-confirm-btn:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
 
+    /* ── BATCH TRACKER ────────────────────── */
+    .batch-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 11px 14px;
+      margin-bottom: 4px;
+      transition: border-color .3s;
+    }
+    .batch-card.warn   { border-color: rgba(249,115,22,0.5); }
+    .batch-card.danger { border-color: rgba(239,68,68,0.55); }
+    .batch-left { flex: 1; min-width: 0; }
+    .batch-title {
+      font-size: 0.5rem;
+      font-weight: 600;
+      letter-spacing: 0.38em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 5px;
+    }
+    .batch-bar-wrap {
+      height: 5px;
+      background: var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+      margin-bottom: 5px;
+    }
+    .batch-bar {
+      height: 100%;
+      border-radius: 3px;
+      background: var(--gold);
+      transition: width .4s cubic-bezier(0.23,1,0.32,1), background .3s;
+      width: 0%;
+    }
+    .batch-sub {
+      font-size: 0.62rem;
+      color: var(--muted);
+    }
+    .batch-remaining {
+      font-size: 1.6rem;
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: -0.03em;
+      color: var(--cream);
+      transition: color .3s;
+      white-space: nowrap;
+    }
+    .batch-card.warn   .batch-remaining { color: var(--orange); }
+    .batch-card.danger .batch-remaining { color: var(--red); }
+    .batch-set-btn {
+      background: none;
+      border: 1px solid var(--border-g);
+      border-radius: 7px;
+      color: var(--gold);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.6rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 6px 10px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+    .batch-set-btn:active { opacity: 0.7; }
+
+    /* batch input sheet */
+    .batch-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.82);
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      z-index: 1002;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .18s;
+      padding-bottom: var(--safe-b);
+    }
+    .batch-overlay.show { opacity: 1; pointer-events: all; }
+    .batch-sheet {
+      background: var(--card);
+      border-radius: 20px 20px 0 0;
+      border-top: 1px solid var(--border-g);
+      padding: 14px 20px 28px;
+      width: 100%;
+      max-width: 480px;
+      transform: translateY(20px);
+      transition: transform .22s cubic-bezier(0.23,1,0.32,1);
+    }
+    .batch-overlay.show .batch-sheet { transform: translateY(0); }
+    .batch-sheet-handle {
+      width: 36px; height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      margin: 0 auto 18px;
+    }
+    .batch-sheet-title {
+      font-size: 0.55rem;
+      font-weight: 600;
+      letter-spacing: 0.38em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 14px;
+    }
+    .batch-input-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .batch-num-input {
+      flex: 1;
+      background: var(--raised);
+      border: 1px solid var(--border-g);
+      border-radius: 10px;
+      color: var(--cream);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 2rem;
+      font-weight: 700;
+      text-align: center;
+      padding: 12px;
+      -moz-appearance: textfield;
+    }
+    .batch-num-input:focus { outline: none; border-color: var(--gold); }
+    .batch-num-input::-webkit-outer-spin-button,
+    .batch-num-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+    .batch-warn-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .batch-warn-label {
+      font-size: 0.62rem;
+      color: var(--muted);
+      flex: 1;
+    }
+    .batch-warn-input {
+      background: var(--raised);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      color: var(--orange);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 700;
+      width: 56px;
+      height: 32px;
+      text-align: center;
+      padding: 0 6px;
+      -moz-appearance: textfield;
+    }
+    .batch-warn-input:focus { outline: none; border-color: var(--orange); }
+    .batch-warn-input::-webkit-outer-spin-button,
+    .batch-warn-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+    .batch-save-btn {
+      width: 100%;
+      background: var(--gold);
+      color: #000;
+      border: none;
+      border-radius: 10px;
+      padding: 15px;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 700;
+      font-size: 0.82rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .batch-save-btn:active { opacity: 0.8; }
+
     /* ── CHECKLIST / DIARIO ────────────────── */
     .ops-overview {
       background: var(--card);
@@ -1268,6 +1444,17 @@
       <button class="pay-btn"          data-pay="applepay">Apple Pay</button>
     </div>
 
+    <!-- BATCH TRACKER -->
+    <div class="batch-card" id="batchCard">
+      <div class="batch-left">
+        <div class="batch-title">Banderillas hoy</div>
+        <div class="batch-bar-wrap"><div class="batch-bar" id="batchBar"></div></div>
+        <div class="batch-sub" id="batchSub">Sin definir — toca "Definir"</div>
+      </div>
+      <div class="batch-remaining" id="batchRemaining">—</div>
+      <button class="batch-set-btn" id="batchSetBtn">Definir</button>
+    </div>
+
     <div class="sec-label">Producto</div>
     <div class="product-grid" id="productGrid"></div>
 
@@ -1400,6 +1587,23 @@
       <button class="modal-btn cancel"  id="modalCancel">Cancelar</button>
       <button class="modal-btn confirm" id="modalConfirm">Confirmar</button>
     </div>
+  </div>
+</div>
+
+<!-- BATCH INPUT SHEET -->
+<div class="batch-overlay" id="batchOverlay">
+  <div class="batch-sheet">
+    <div class="batch-sheet-handle"></div>
+    <div class="batch-sheet-title">Producción del día</div>
+    <div class="batch-input-wrap">
+      <input class="batch-num-input" id="batchNumInput" type="number" inputmode="numeric" min="1" max="999" placeholder="0">
+    </div>
+    <div class="batch-warn-row">
+      <span class="batch-warn-label">Avisar cuando queden menos de</span>
+      <input class="batch-warn-input" id="batchWarnInput" type="number" inputmode="numeric" min="1" max="99" value="8">
+      <span style="font-size:0.62rem;color:var(--muted)">pzas</span>
+    </div>
+    <button class="batch-save-btn" id="batchSaveBtn">Guardar</button>
   </div>
 </div>
 
@@ -1920,6 +2124,7 @@ function commitSale() {
   saveStock(stock);
   document.getElementById('undoBtn').disabled = false;
   renderTodaySummary();
+  renderBatchCard();
   clearCart();
   showToast(count + (count===1?' venta':' ventas') + ' &nbsp;<span class="t-price">$' + total.toLocaleString('es-MX') + '</span>');
 }
@@ -1975,6 +2180,7 @@ document.getElementById('undoBtn').addEventListener('click', function(){
     var remaining = sales.filter(function(s){ return s.date === todayStr(); });
     document.getElementById('undoBtn').disabled = !remaining.length;
     renderTodaySummary();
+    renderBatchCard();
     showToast(group.length + (group.length===1?' venta':' ventas') + ' canceladas');
   });
 });
@@ -2039,6 +2245,7 @@ renderTodaySummary();
 var todayCount = sales.filter(function(s){ return s.date === todayStr(); }).length;
 if (todayCount) document.getElementById('undoBtn').disabled = false;
 updateOpsProgress(loadChecklist());
+renderBatchCard();
 sbFetchAndMerge();
 
 /* ── STOCK ─────────────────────────────── */
@@ -2368,6 +2575,85 @@ function renderProdCosts(costs, ranchPorPorcion) {
     list.appendChild(card);
   });
 }
+
+/* ── BATCH TRACKER ────────────────────── */
+function loadBatch() {
+  try {
+    var d = JSON.parse(localStorage.getItem('ck_batch') || 'null');
+    if (!d || d.date !== todayStr()) return { date: todayStr(), total: 0, warn: 8 };
+    return d;
+  } catch(e) { return { date: todayStr(), total: 0, warn: 8 }; }
+}
+function saveBatch(d) { localStorage.setItem('ck_batch', JSON.stringify(d)); }
+
+function getBanderillasSoldToday() {
+  return sales.filter(function(s) {
+    var p = PRODUCTS.find(function(p) { return p.id === s.product; });
+    return s.date === todayStr() && p && p.base !== 'agua';
+  }).length;
+}
+
+var _batchWarnFired = false;
+
+function renderBatchCard() {
+  var batch     = loadBatch();
+  var sold      = getBanderillasSoldToday();
+  var remaining = batch.total > 0 ? batch.total - sold : null;
+  var card      = document.getElementById('batchCard');
+  var barEl     = document.getElementById('batchBar');
+  var remEl     = document.getElementById('batchRemaining');
+  var subEl     = document.getElementById('batchSub');
+
+  if (!batch.total) {
+    remEl.textContent = '—';
+    subEl.textContent = 'Sin definir — toca "Definir"';
+    barEl.style.width = '0%';
+    card.className = 'batch-card';
+    return;
+  }
+
+  var pct = Math.max(0, Math.min(100, remaining / batch.total * 100));
+  remEl.textContent = remaining;
+  subEl.textContent = sold + ' vendidas de ' + batch.total + ' preparadas';
+  barEl.style.width = pct + '%';
+
+  if (remaining <= 0) {
+    card.className         = 'batch-card danger';
+    barEl.style.background = 'var(--red)';
+  } else if (remaining <= batch.warn) {
+    card.className         = 'batch-card warn';
+    barEl.style.background = 'var(--orange)';
+    if (!_batchWarnFired) {
+      _batchWarnFired = true;
+      showToast('⚠ Quedan ' + remaining + ' banderillas');
+    }
+  } else {
+    card.className         = 'batch-card';
+    barEl.style.background = 'var(--gold)';
+    _batchWarnFired = false;
+  }
+}
+
+document.getElementById('batchSetBtn').addEventListener('click', function() {
+  var batch = loadBatch();
+  document.getElementById('batchNumInput').value  = batch.total || '';
+  document.getElementById('batchWarnInput').value = batch.warn  || 8;
+  document.getElementById('batchOverlay').classList.add('show');
+  setTimeout(function(){ document.getElementById('batchNumInput').focus(); }, 180);
+});
+document.getElementById('batchOverlay').addEventListener('click', function(e) {
+  if (e.target === this) this.classList.remove('show');
+});
+document.getElementById('batchSaveBtn').addEventListener('click', function() {
+  var total = parseInt(document.getElementById('batchNumInput').value, 10);
+  var warn  = parseInt(document.getElementById('batchWarnInput').value, 10);
+  if (!total || total < 1) { showToast('Ingresa un número válido'); return; }
+  _batchWarnFired = false;
+  saveBatch({ date: todayStr(), total: total, warn: warn || 8 });
+  document.getElementById('batchOverlay').classList.remove('show');
+  renderBatchCard();
+  showToast(total + ' banderillas registradas');
+});
 
 /* ── CHECKLIST / DIARIO ────────────────── */
 var CHECKLIST = [
