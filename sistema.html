@@ -1505,9 +1505,10 @@ var STOCK_DEF = {
 };
 
 var RECIPE = {
-  res:   { salchicha: 1,   chopsticks: 1, harina: 60, huevo: 0.25, leche: 43 },
-  mozz:  { queso: 50,      chopsticks: 1, harina: 60, huevo: 0.25, leche: 43 },
-  mitad: { salchicha: 0.5, queso: 30,    chopsticks: 1, harina: 60, huevo: 0.25, leche: 43 },
+  // Masa: 1 bolsa harina + 1 huevo + 550ml leche = 16 banderillas
+  res:   { salchicha: 1,   chopsticks: 1, harina: 60, huevo: 0.0625, leche: 34.4 },
+  mozz:  { queso: 50,      chopsticks: 1, harina: 60, huevo: 0.0625, leche: 34.4 },
+  mitad: { salchicha: 0.5, queso: 30,    chopsticks: 1, harina: 60, huevo: 0.0625, leche: 34.4 },
   agua:  { agua: 1 },
 };
 
@@ -2177,7 +2178,7 @@ var COST_ING = [
   { key: 'agua',       label: 'Agua Fresca',       unit: 'por vaso', step: '0.01', decimals: 2, def: 17    },
 ];
 
-var RANCH_DEFAULTS = { mayo: 179.02, hierbas: 35, porciones: 85 };
+var RANCH_DEFAULTS = { mayo: 179.02, ajo: 25, perejil: 25, porciones: 85 };
 
 function loadCosts() { try { return JSON.parse(localStorage.getItem('ck_costs') || 'null'); } catch(e){ return null; } }
 function saveCosts(d){ localStorage.setItem('ck_costs', JSON.stringify(d)); }
@@ -2193,7 +2194,9 @@ function getCosts() {
 function getRanchData() {
   var r = loadRanchData() || {};
   if (r.mayo      === undefined) r.mayo      = RANCH_DEFAULTS.mayo;
-  if (r.hierbas   === undefined) r.hierbas   = RANCH_DEFAULTS.hierbas;
+  // migración: si tenía hierbas (campo viejo) lo reparte entre ajo y perejil
+  if (r.ajo       === undefined) r.ajo       = r.hierbas !== undefined ? r.hierbas / 2 : RANCH_DEFAULTS.ajo;
+  if (r.perejil   === undefined) r.perejil   = r.hierbas !== undefined ? r.hierbas / 2 : RANCH_DEFAULTS.perejil;
   if (r.porciones === undefined) r.porciones = RANCH_DEFAULTS.porciones;
   return r;
 }
@@ -2261,48 +2264,72 @@ function renderCostInputs(costs, ranch) {
       c[this.dataset.key] = val;
       saveCosts(c);
       var r = getRanchData();
-      var rpp = r.porciones > 0 ? (r.mayo + r.hierbas) / r.porciones : 0;
+      var rpp = r.porciones > 0 ? (r.mayo + r.ajo + r.perejil) / r.porciones : 0;
       renderProdCosts(c, rpp);
     });
   });
 }
 
 function renderRanchCard(ranch, costs) {
-  var total = ranch.mayo + ranch.hierbas;
+  var total = ranch.mayo + ranch.ajo + ranch.perejil;
   var rpp   = ranch.porciones > 0 ? total / ranch.porciones : 0;
   var card  = document.getElementById('ranchCard');
   card.innerHTML = '';
 
-  function mkRow(label, val, gold, editId) {
+  function mkMoney(label, fieldKey, val) {
     var row = document.createElement('div');
     row.className = 'ranch-row';
-    if (editId) {
-      row.innerHTML =
-        '<span class="ranch-row-label">' + label + '</span>' +
-        '<div style="display:flex;align-items:center;gap:5px">' +
-          '<input class="cost-input" type="number" inputmode="numeric" min="1" step="1" id="' + editId + '" value="' + val + '" style="width:64px">' +
-          '<span style="font-size:0.65rem;color:var(--muted)">pzas</span>' +
-        '</div>';
-    } else {
-      row.innerHTML =
-        '<span class="ranch-row-label">' + label + '</span>' +
-        '<span class="ranch-row-val' + (gold ? ' gold' : '') + '">' + val + '</span>';
-    }
+    row.innerHTML =
+      '<span class="ranch-row-label">' + label + '</span>' +
+      '<div style="display:flex;align-items:center;gap:5px">' +
+        '<span style="font-size:0.65rem;color:var(--muted)">$</span>' +
+        '<input class="cost-input" type="number" inputmode="decimal" min="0" step="0.01"' +
+          ' data-field="' + fieldKey + '" value="' + Number(val).toFixed(2) + '" style="width:72px">' +
+      '</div>';
+    row.querySelector('input').addEventListener('change', function() {
+      var v = parseFloat(this.value); if (isNaN(v) || v < 0) v = 0;
+      var r = getRanchData(); r[this.dataset.field] = v; saveRanchData(r);
+      var newTotal = r.mayo + r.ajo + r.perejil;
+      var newRpp   = r.porciones > 0 ? newTotal / r.porciones : 0;
+      card.querySelector('.ranch-total').textContent  = '$' + newTotal.toFixed(2);
+      card.querySelector('.ranch-rpp').textContent    = '$' + newRpp.toFixed(2);
+      renderProdCosts(getCosts(), newRpp);
+    });
     return row;
   }
 
-  card.appendChild(mkRow('Mayonesa McCor 1.7 kg', '$' + ranch.mayo.toFixed(2)));
-  card.appendChild(mkRow('Perejil + Ajo', '$' + ranch.hierbas.toFixed(2)));
-  card.appendChild(mkRow('Costo total lote', '$' + total.toFixed(2)));
-  card.appendChild(mkRow('Porciones estimadas', ranch.porciones, false, 'ranchPorcInput'));
-  card.appendChild(mkRow('Costo por porción', '$' + rpp.toFixed(2), true));
+  card.appendChild(mkMoney('Mayonesa 626g', 'mayo', ranch.mayo));
+  card.appendChild(mkMoney('Ajo (cabeza)', 'ajo', ranch.ajo));
+  card.appendChild(mkMoney('Perejil (manojo)', 'perejil', ranch.perejil));
+
+  var totalRow = document.createElement('div');
+  totalRow.className = 'ranch-row';
+  totalRow.innerHTML = '<span class="ranch-row-label">Costo total lote</span>' +
+    '<span class="ranch-row-val ranch-total">$' + total.toFixed(2) + '</span>';
+  card.appendChild(totalRow);
+
+  var porcRow = document.createElement('div');
+  porcRow.className = 'ranch-row';
+  porcRow.innerHTML =
+    '<span class="ranch-row-label">Porciones estimadas</span>' +
+    '<div style="display:flex;align-items:center;gap:5px">' +
+      '<input class="cost-input" type="number" inputmode="numeric" min="1" step="1"' +
+        ' id="ranchPorcInput" value="' + ranch.porciones + '" style="width:64px">' +
+      '<span style="font-size:0.65rem;color:var(--muted)">pzas</span>' +
+    '</div>';
+  card.appendChild(porcRow);
+
+  var rppRow = document.createElement('div');
+  rppRow.className = 'ranch-row';
+  rppRow.innerHTML = '<span class="ranch-row-label">Costo por porción</span>' +
+    '<span class="ranch-row-val gold ranch-rpp">$' + rpp.toFixed(2) + '</span>';
+  card.appendChild(rppRow);
 
   document.getElementById('ranchPorcInput').addEventListener('change', function() {
     var val = parseInt(this.value) || 1;
-    ranch.porciones = val;
-    saveRanchData(ranch);
-    var newRpp = (ranch.mayo + ranch.hierbas) / val;
-    card.querySelector('.ranch-row:last-child .ranch-row-val').textContent = '$' + newRpp.toFixed(2);
+    var r = getRanchData(); r.porciones = val; saveRanchData(r);
+    var newRpp = (r.mayo + r.ajo + r.perejil) / val;
+    card.querySelector('.ranch-rpp').textContent = '$' + newRpp.toFixed(2);
     renderProdCosts(getCosts(), newRpp);
   });
 
