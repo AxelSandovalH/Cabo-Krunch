@@ -198,6 +198,8 @@
       position: relative;
       overflow: hidden;
       user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
       touch-action: manipulation;
     }
     .prod-btn::before {
@@ -1450,10 +1452,13 @@
       <div class="batch-left">
         <div class="batch-title">Banderillas hoy</div>
         <div class="batch-bar-wrap"><div class="batch-bar" id="batchBar"></div></div>
-        <div class="batch-sub" id="batchSub">Sin definir — toca "Definir"</div>
+        <div class="batch-sub" id="batchSub">Sin definir — toca "Editar"</div>
       </div>
       <div class="batch-remaining" id="batchRemaining">—</div>
-      <button class="batch-set-btn" id="batchSetBtn">Definir</button>
+      <div style="display:flex;flex-direction:column;gap:5px;flex-shrink:0;">
+        <button class="batch-set-btn" id="batchAddLoteBtn">+ Lote</button>
+        <button class="batch-set-btn" id="batchSetBtn">Editar</button>
+      </div>
     </div>
 
     <div class="sec-label">Producto</div>
@@ -2607,15 +2612,16 @@ function renderBatchCard() {
 
   if (!batch.total) {
     remEl.textContent = '—';
-    subEl.textContent = 'Sin definir — toca "Definir"';
+    subEl.textContent = 'Sin definir — toca "Editar"';
     barEl.style.width = '0%';
     card.className = 'batch-card';
     return;
   }
 
-  var pct = Math.max(0, Math.min(100, remaining / batch.total * 100));
+  var pct      = Math.max(0, Math.min(100, remaining / batch.total * 100));
+  var mezclas  = Math.ceil(batch.total / 16);
   remEl.textContent = remaining;
-  subEl.textContent = sold + ' vendidas de ' + batch.total + ' preparadas';
+  subEl.textContent = sold + ' vendidas · ' + batch.total + ' preparadas · ' + mezclas + (mezclas === 1 ? ' mezcla' : ' mezclas');
   barEl.style.width = pct + '%';
 
   if (remaining <= 0) {
@@ -2634,6 +2640,23 @@ function renderBatchCard() {
     _batchWarnFired = false;
   }
 }
+
+document.getElementById('batchAddLoteBtn').addEventListener('click', function() {
+  var batch = loadBatch();
+  if (!batch.total) {
+    // No batch yet — open the full editor instead
+    document.getElementById('batchNumInput').value  = 16;
+    document.getElementById('batchWarnInput').value = batch.warn || 8;
+    document.getElementById('batchOverlay').classList.add('show');
+    setTimeout(function(){ document.getElementById('batchNumInput').focus(); }, 180);
+    return;
+  }
+  _batchWarnFired = false;
+  batch.total += 16;
+  saveBatch(batch);
+  renderBatchCard();
+  showToast('+16 banderillas · ' + Math.ceil(batch.total / 16) + ' mezclas');
+});
 
 document.getElementById('batchSetBtn').addEventListener('click', function() {
   var batch = loadBatch();
