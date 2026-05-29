@@ -2732,6 +2732,7 @@ function loadChecklist() {
 function saveChecklist(d) { localStorage.setItem('ck_checklist', JSON.stringify(d)); }
 
 function ckTotalItems() {
+  if (!CHECKLIST) return 0;
   return CHECKLIST.reduce(function(n, s) { return n + s.items.length; }, 0);
 }
 function ckCheckedCount(data) {
