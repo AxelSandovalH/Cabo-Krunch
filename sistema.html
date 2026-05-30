@@ -672,6 +672,31 @@
     .toast .t-price { color: var(--gold); }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
+    /* ── KBD RECONNECT BANNER ──────────────── */
+    .kbd-banner {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      background: rgba(196,154,60,0.15);
+      border-bottom: 1px solid rgba(196,154,60,0.35);
+      color: var(--gold);
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-align: center;
+      padding: 10px 16px;
+      padding-top: calc(10px + var(--safe-t));
+      z-index: 1100;
+      opacity: 0;
+      transform: translateY(-100%);
+      transition: opacity .25s, transform .25s;
+      pointer-events: none;
+    }
+    .kbd-banner.show {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
     /* ── MODAL ─────────────────────────────── */
     .modal-overlay {
       position: fixed; inset: 0;
@@ -1637,6 +1662,9 @@
 </main>
 
 <div class="toast" id="toast"></div>
+
+<!-- kbd reconnect banner -->
+<div class="kbd-banner" id="kbdBanner">⌨ Toca la pantalla para activar el teclado</div>
 
 
 <div class="modal-overlay" id="modal">
@@ -3059,6 +3087,43 @@ if (isKiosk) {
   document.addEventListener('touchstart', resetIdle, { passive: true });
   resetIdle();
 }
+
+/* ── KEYBOARD FOCUS MANAGEMENT (iOS OTG reconnect) ── */
+(function() {
+  var banner = document.getElementById('kbdBanner');
+
+  // Make body programmatically focusable so keyboard events reach document
+  document.body.setAttribute('tabindex', '-1');
+  document.body.style.outline = 'none';
+
+  function restoreFocus() {
+    // Only steal focus if no interactive element needs it
+    var ae = document.activeElement;
+    if (!ae || (ae.tagName !== 'INPUT' && ae.tagName !== 'TEXTAREA' && ae.tagName !== 'BUTTON' && ae.tagName !== 'SELECT')) {
+      document.body.focus();
+    }
+    banner.classList.remove('show');
+    _lastKey = null;
+  }
+
+  // Every tap on a non-interactive area restores keyboard focus
+  document.addEventListener('touchend', restoreFocus, { passive: true });
+  document.addEventListener('click',    restoreFocus);
+
+  // When page loses focus (USB disconnect) show the banner in kbd mode
+  window.addEventListener('blur', function() {
+    if (document.body.classList.contains('kbd')) {
+      banner.classList.add('show');
+    }
+  });
+
+  // When page regains focus (USB reconnect or screen tap)
+  window.addEventListener('focus', function() {
+    banner.classList.remove('show');
+    _lastKey = null;
+    document.body.focus();
+  });
+}());
 
 }());
 </script>
