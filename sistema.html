@@ -210,7 +210,8 @@
       background: var(--border-g);
     }
     .prod-btn:active { transform: scale(0.96); background: #181818; }
-    .prod-btn.flash  { background: var(--gold-dim); border-color: var(--border-g); }
+    .prod-btn.flash      { background: var(--gold-dim); border-color: var(--border-g); }
+    .prod-btn.flash-sub  { background: rgba(239,68,68,0.18); border-color: rgba(239,68,68,0.4); }
     .prod-btn.holding::after {
       content: '';
       position: absolute; inset: 0;
@@ -2890,6 +2891,10 @@ var NUMPAD_MAP = {};
 PRODUCTS.forEach(function(p){ if (p.key) NUMPAD_MAP[p.key] = p.id; });
 var BILL_KEYS = { '1':20, '2':50, '3':100, '4':200, '5':500 };
 
+var _lastKey = null;
+var _lastKeyTs = 0;
+var DOUBLE_TAP_MS = 320;
+
 document.addEventListener('keydown', function(e) {
   if (!document.body.classList.contains('kbd')) {
     document.body.classList.add('kbd');
@@ -2946,7 +2951,20 @@ document.addEventListener('keydown', function(e) {
 
   var normKey = (code === 'NumpadDivide') ? '/' : (code === 'NumpadMultiply') ? '*' : key;
   if (NUMPAD_MAP[normKey]) {
-    addToCart(NUMPAD_MAP[normKey]);
+    var now = Date.now();
+    if (normKey === _lastKey && (now - _lastKeyTs) < DOUBLE_TAP_MS) {
+      removeFromCartDirect(NUMPAD_MAP[normKey]);
+      _lastKey = null;
+      var subBtn = document.querySelector('[data-id="' + NUMPAD_MAP[normKey] + '"]');
+      if (subBtn) {
+        subBtn.classList.add('flash-sub');
+        setTimeout(function(){ subBtn.classList.remove('flash-sub'); }, 280);
+      }
+    } else {
+      addToCart(NUMPAD_MAP[normKey]);
+      _lastKey = normKey;
+      _lastKeyTs = now;
+    }
     e.preventDefault();
   } else if (key === 'Enter' || code === 'NumpadEnter' || key === '+' || code === 'NumpadAdd') {
     if (cartItemCount() > 0) openSellSheet();
