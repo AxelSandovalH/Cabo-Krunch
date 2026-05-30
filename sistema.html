@@ -240,14 +240,48 @@
     .prod-btn .p-key {
       position: absolute;
       bottom: 7px; right: 8px;
-      font-size: 0.52rem;
+      font-size: 0.6rem;
       font-weight: 700;
-      color: var(--muted);
+      color: var(--gold);
       letter-spacing: 0;
       line-height: 1;
-      opacity: 0.5;
+      opacity: 0.55;
+      background: rgba(196,154,60,0.08);
+      border: 1px solid rgba(196,154,60,0.2);
+      border-radius: 3px;
+      padding: 1px 4px;
     }
     .prod-btn.in-cart .p-key { opacity: 0; }
+
+    /* ── KEYPAD REFERENCE ──────────────────── */
+    .keypad-ref {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+      flex-wrap: wrap;
+      padding: 10px 0 4px;
+      margin-top: 2px;
+    }
+    .kref-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.62rem;
+      color: var(--muted);
+      font-family: 'DM Sans', sans-serif;
+    }
+    .kref-key {
+      background: #1c1c1c;
+      border: 1px solid var(--border);
+      border-bottom: 2px solid #333;
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-size: 0.6rem;
+      font-weight: 700;
+      color: var(--cream);
+      font-family: monospace;
+      line-height: 1.4;
+    }
 
     /* ── UNDO ──────────────────────────────── */
     .undo-btn {
@@ -1464,6 +1498,15 @@
     <div class="sec-label">Producto</div>
     <div class="product-grid" id="productGrid"></div>
 
+    <!-- KEYPAD REFERENCE -->
+    <div class="keypad-ref" id="keypadRef">
+      <div class="kref-item"><span class="kref-key">↵</span><span>Cobrar</span></div>
+      <div class="kref-item"><span class="kref-key">+</span><span>Cobrar</span></div>
+      <div class="kref-item"><span class="kref-key">⌫</span><span>Deshacer</span></div>
+      <div class="kref-item"><span class="kref-key">−</span><span>Vaciar</span></div>
+      <div class="kref-item"><span class="kref-key">.</span><span>Vaciar</span></div>
+    </div>
+
     <!-- CART BAR -->
     <div class="cart-bar" id="cartBar">
       <div class="cart-summary">
@@ -1696,11 +1739,11 @@ var PRODUCTS = [
   { id: 'mozz',    name: 'Mozza-\nrella',       price: 80,  base: 'mozz',  key: '3' },
   { id: 'mozz_p',  name: 'Mozz\n+ Papa',        price: 85,  base: 'mozz',  key: '4' },
   { id: 'mitad',   name: 'Mitad\ny Mitad',      price: 80,  base: 'mitad', key: '5' },
-  { id: 'mitad_p', name: 'Mitad\n+ Papa',       price: 85,  base: 'mitad', key: '6' },
+  { id: 'mitad_p', name: 'Mitad\n+ Papa',       price: 85,  base: 'mitad', key: '0' },
+  { id: 'agua_jamaica',   name: 'Jamaica',         price: 30,  base: 'agua',  key: '6' },
   { id: 'agua_maracuya',  name: 'Maracuyá',        price: 30,  base: 'agua',  key: '7' },
   { id: 'agua_naranja',   name: 'Naranja',         price: 30,  base: 'agua',  key: '8' },
   { id: 'agua_pepino',    name: 'Pepino\nc/Limón', price: 30,  base: 'agua',  key: '9' },
-  { id: 'agua_jamaica',   name: 'Jamaica',         price: 30,  base: 'agua',  key: '0' },
   { id: 'agua_horchata',  name: 'Horchata',        price: 30,  base: 'agua',  key: '*' },
   { id: 'agua_tamarindo', name: 'Tamarindo',       price: 30,  base: 'agua',  key: '/' },
 ];
@@ -2889,13 +2932,13 @@ document.addEventListener('keydown', function(e) {
   if (NUMPAD_MAP[normKey]) {
     addToCart(NUMPAD_MAP[normKey]);
     e.preventDefault();
-  } else if (key === 'Enter' || code === 'NumpadEnter') {
+  } else if (key === 'Enter' || code === 'NumpadEnter' || key === '+' || code === 'NumpadAdd') {
     if (cartItemCount() > 0) openSellSheet();
     e.preventDefault();
   } else if (key === 'Backspace') {
     removeLastFromCart();
     e.preventDefault();
-  } else if (key === 'Escape' || key === 'Delete') {
+  } else if (key === 'Escape' || key === 'Delete' || key === '-' || code === 'NumpadSubtract' || code === 'NumpadDecimal') {
     clearCart();
     e.preventDefault();
   }
