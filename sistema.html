@@ -2919,9 +2919,11 @@ var NUMPAD_MAP = {};
 PRODUCTS.forEach(function(p){ if (p.key) NUMPAD_MAP[p.key] = p.id; });
 var BILL_KEYS = { '1':20, '2':50, '3':100, '4':200, '5':500 };
 
-var _lastKey = null;
-var _lastKeyTs = 0;
-var DOUBLE_TAP_MS = 320;
+var _lastKey = null; clearTimeout(_holdTimer); _holdKey = null; _didHold = false;
+var _holdKey  = null;
+var _holdTimer = null;
+var _didHold  = false;
+var HOLD_MS   = 380;
 
 document.addEventListener('keydown', function(e) {
   if (!document.body.classList.contains('kbd')) {
@@ -2984,20 +2986,18 @@ document.addEventListener('keydown', function(e) {
 
   var normKey = (code === 'NumpadDivide') ? '/' : (code === 'NumpadMultiply') ? '*' : key;
   if (NUMPAD_MAP[normKey]) {
-    var now = Date.now();
-    if (normKey === _lastKey && (now - _lastKeyTs) < DOUBLE_TAP_MS) {
+    if (e.repeat) { e.preventDefault(); return; }
+    _holdKey  = normKey;
+    _didHold  = false;
+    var hBtn  = document.querySelector('[data-id="' + NUMPAD_MAP[normKey] + '"]');
+    if (hBtn) hBtn.classList.add('holding');
+    clearTimeout(_holdTimer);
+    _holdTimer = setTimeout(function() {
+      _didHold = true;
+      if (hBtn) { hBtn.classList.remove('holding'); hBtn.classList.add('flash-sub'); }
       removeFromCartDirect(NUMPAD_MAP[normKey]);
-      _lastKey = null;
-      var subBtn = document.querySelector('[data-id="' + NUMPAD_MAP[normKey] + '"]');
-      if (subBtn) {
-        subBtn.classList.add('flash-sub');
-        setTimeout(function(){ subBtn.classList.remove('flash-sub'); }, 280);
-      }
-    } else {
-      addToCart(NUMPAD_MAP[normKey]);
-      _lastKey = normKey;
-      _lastKeyTs = now;
-    }
+      setTimeout(function(){ if (hBtn) hBtn.classList.remove('flash-sub'); }, 280);
+    }, HOLD_MS);
     e.preventDefault();
   } else if (key === 'Enter' || code === 'NumpadEnter' || key === '+' || code === 'NumpadAdd') {
     if (cartItemCount() > 0) openSellSheet();
@@ -3009,6 +3009,18 @@ document.addEventListener('keydown', function(e) {
     clearCart();
     e.preventDefault();
   }
+});
+
+document.addEventListener('keyup', function(e) {
+  if (!_holdKey) return;
+  var normKey = (e.code === 'NumpadDivide') ? '/' : (e.code === 'NumpadMultiply') ? '*' : e.key;
+  if (normKey !== _holdKey) return;
+  clearTimeout(_holdTimer);
+  var hBtn = document.querySelector('[data-id="' + NUMPAD_MAP[_holdKey] + '"]');
+  if (hBtn) hBtn.classList.remove('holding');
+  if (!_didHold) addToCart(NUMPAD_MAP[_holdKey]);
+  _holdKey = null;
+  _didHold = false;
 });
 
 /* ── EXPORT / IMPORT ───────────────────── */
@@ -3065,9 +3077,9 @@ document.getElementById('importFile').addEventListener('change', function(){
 
 /* ── RECONNECT: reset double-tap state on page focus/visibility ── */
 document.addEventListener('visibilitychange', function() {
-  if (!document.hidden) _lastKey = null;
+  if (!document.hidden) _lastKey = null; clearTimeout(_holdTimer); _holdKey = null; _didHold = false;
 });
-window.addEventListener('focus', function() { _lastKey = null; });
+window.addEventListener('focus', function() { _lastKey = null; clearTimeout(_holdTimer); _holdKey = null; _didHold = false; });
 
 /* ── IDLE → SCREENSAVER (solo modo kiosk) ── */
 var idleTimer;
@@ -3103,7 +3115,7 @@ if (isKiosk) {
       document.body.focus();
     }
     banner.classList.remove('show');
-    _lastKey = null;
+    _lastKey = null; clearTimeout(_holdTimer); _holdKey = null; _didHold = false;
   }
 
   // Every tap on a non-interactive area restores keyboard focus
@@ -3120,7 +3132,7 @@ if (isKiosk) {
   // When page regains focus (USB reconnect or screen tap)
   window.addEventListener('focus', function() {
     banner.classList.remove('show');
-    _lastKey = null;
+    _lastKey = null; clearTimeout(_holdTimer); _holdKey = null; _didHold = false;
     document.body.focus();
   });
 }());
