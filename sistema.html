@@ -2926,7 +2926,12 @@ document.addEventListener('keydown', function(e) {
 
   // ── Any other input focused — don't hijack ──
   var ae = document.activeElement;
-  if (ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA') && key !== 'Escape') return;
+  if (ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA') && key !== 'Escape') {
+    // Numpad product keys always win — blur the input and let them through
+    var testKey = (code === 'NumpadDivide') ? '/' : (code === 'NumpadMultiply') ? '*' : key;
+    if (!NUMPAD_MAP[testKey]) return;
+    ae.blur();
+  }
 
   // ── Sell sheet ──
   if (document.getElementById('sellOverlay').classList.contains('show')) {
@@ -3029,6 +3034,12 @@ document.getElementById('importFile').addEventListener('change', function(){
   reader.readAsText(file);
   this.value = '';
 });
+
+/* ── RECONNECT: reset double-tap state on page focus/visibility ── */
+document.addEventListener('visibilitychange', function() {
+  if (!document.hidden) _lastKey = null;
+});
+window.addEventListener('focus', function() { _lastKey = null; });
 
 /* ── IDLE → SCREENSAVER (solo modo kiosk) ── */
 var idleTimer;
