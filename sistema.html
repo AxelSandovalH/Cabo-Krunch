@@ -2763,44 +2763,47 @@ document.getElementById('batchSaveBtn').addEventListener('click', function() {
 
 /* ── CHECKLIST / DIARIO ────────────────── */
 var CHECKLIST = [
-  { id: 'limpieza', label: 'Limpieza', items: [
-    { id: 'l1', text: 'Limpiar freidora (cambiar aceite si aplica)' },
-    { id: 'l2', text: 'Limpiar área de trabajo y superficies' },
-    { id: 'l3', text: 'Lavar utensilios y bandejas' },
-    { id: 'l4', text: 'Limpiar pisos' },
-    { id: 'l5', text: 'Revisar y limpiar refrigerador' },
+  { id: 'manana', label: 'Mañana', items: [
+    { id: 'm1', text: 'Lavar trastes sucios' },
+    { id: 'm2', text: 'Revisar sistema y ventas del día anterior' },
+    { id: 'm3', text: 'Hacer banderillas si se necesitan (masa en la mañana)' },
   ]},
-  { id: 'produccion', label: 'Producción', items: [
-    { id: 'p1', text: 'Preparar masa de banderilla' },
-    { id: 'p2', text: 'Contar y preparar salchichas' },
-    { id: 'p3', text: 'Preparar queso mozzarella' },
-    { id: 'p4', text: 'Preparar aguas frescas' },
-    { id: 'p5', text: 'Revisar y contar palitos (chopsticks)' },
+  { id: 'limpieza', label: 'Limpieza (~5pm)', items: [
+    { id: 'l1', text: 'Barrer cocina y área de producción' },
+    { id: 'l2', text: 'Trapear' },
+    { id: 'l3', text: 'Limpiar mesa de acero' },
   ]},
-  { id: 'setup', label: 'Setup', items: [
-    { id: 's1', text: 'Calentar aceite a temperatura correcta' },
-    { id: 's2', text: 'Surtir ingredientes en estación de trabajo' },
-    { id: 's3', text: 'Preparar salsas y condimentos' },
-    { id: 's4', text: 'Verificar que el equipo esté funcionando' },
-    { id: 's5', text: 'Organizar y acomodar la estación' },
+  { id: 'setup', label: 'Setup (~6pm)', items: [
+    { id: 's1', text: 'Encender la freidora' },
+    { id: 's2', text: 'Poner letrero afuera (solo si el estacionamiento está libre)' },
+    { id: 's3', text: 'Rellenar y limpiar mamilas de salsas' },
+    { id: 's4', text: 'Revisar polvos y toppings' },
+  ]},
+  { id: 'misplace', label: 'Mise en Place', items: [
+    { id: 'mp1', text: 'Asistente: servilletas de papel, cuadriculadas en cuartos y bolsas de papel' },
+    { id: 'mp2', text: 'Caja togo: aluminio + servilleta + hoja cuadriculada (en ese orden)' },
+    { id: 'mp3', text: 'Charolas cortadas con cuarto de servilleta cuadriculada stacked' },
+    { id: 'mp4', text: 'Hacer la masa' },
+    { id: 'mp5', text: 'Hacer la papa' },
   ]},
   { id: 'abrir', label: 'Abrir', items: [
-    { id: 'a1', text: 'Poner señalización y letrero exterior' },
-    { id: 'a2', text: 'Confirmar efectivo en caja' },
-    { id: 'a3', text: 'Activar Punto de Venta (POS)' },
-    { id: 'a4', text: 'Tomar foto para redes sociales' },
+    { id: 'a1', text: 'Preparar caja de dinero' },
+    { id: 'a2', text: 'Preparar Krunch POS' },
+    { id: 'a3', text: 'Preparar hielera' },
+    { id: 'a4', text: 'Abrir' },
   ]},
-  { id: 'software', label: 'Revisar Sistema', items: [
-    { id: 'sw1', text: 'Revisar ventas del día anterior' },
-    { id: 'sw2', text: 'Actualizar stock de ingredientes' },
-    { id: 'sw3', text: 'Verificar sincronización con base de datos' },
+  { id: 'turno', label: 'Durante el Turno', items: [
+    { id: 't1', text: 'Mantener freidora limpia durante el servicio' },
+    { id: 't2', text: 'Poner letrero si el estacionamiento se desocupó' },
   ]},
-  { id: 'cerrar', label: 'Cerrar', items: [
-    { id: 'c1', text: 'Contar y registrar efectivo del día' },
-    { id: 'c2', text: 'Exportar respaldo de datos' },
-    { id: 'c3', text: 'Limpiar área de trabajo al terminar' },
-    { id: 'c4', text: 'Apagar equipo y POS' },
-    { id: 'c5', text: 'Asegurar y cerrar el local' },
+  { id: 'cierre', label: 'Cierre', items: [
+    { id: 'c1', text: 'Apagar la freidora' },
+    { id: 'c2', text: 'Meter el letrero y los bancos' },
+    { id: 'c3', text: 'Cerrar ventana y poner candados' },
+    { id: 'c4', text: 'Dejar limpia el área de trabajo' },
+    { id: 'c5', text: 'Tirar la masa' },
+    { id: 'c6', text: 'Dejar hielera abierta' },
+    { id: 'c7', text: 'Lavar o poner a remojar los trastes' },
   ]},
 ];
 
