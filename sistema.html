@@ -13,6 +13,7 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700&family=Bangers&display=swap" rel="stylesheet">
   <link rel="icon" href="img/logo-icon.jpg" type="image/jpeg">
   <link rel="apple-touch-icon" href="img/logo-icon.jpg">
+  <link rel="manifest" href="manifest.json">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -1457,6 +1458,142 @@
       text-decoration: line-through;
       text-decoration-color: var(--muted);
     }
+
+    /* ── NOTIFICACIONES ─────────────────────── */
+    .notif-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 4px;
+    }
+    .notif-card-info { flex: 1; }
+    .notif-card-title {
+      font-size: 0.74rem;
+      font-weight: 600;
+      color: var(--cream);
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .notif-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      background: var(--muted);
+    }
+    .notif-dot.on { background: var(--green); box-shadow: 0 0 5px rgba(34,197,94,0.55); }
+    .notif-card-sub {
+      font-size: 0.58rem;
+      color: var(--muted);
+      margin-top: 3px;
+      letter-spacing: 0.04em;
+    }
+    .notif-btn {
+      background: none;
+      border: 1px solid var(--border-g);
+      border-radius: 8px;
+      color: var(--gold);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.56rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 7px 14px;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      transition: background .14s;
+    }
+    .notif-btn:active { background: rgba(196,154,60,0.12); }
+
+    /* Notif config overlay */
+    .notif-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.74);
+      z-index: 80;
+      display: flex; align-items: flex-end;
+      opacity: 0; pointer-events: none;
+      transition: opacity .22s;
+    }
+    .notif-overlay.show { opacity: 1; pointer-events: all; }
+    .notif-sheet {
+      width: 100%; max-width: 480px; margin: 0 auto;
+      background: #111;
+      border-radius: 20px 20px 0 0;
+      padding-bottom: max(28px, env(safe-area-inset-bottom, 28px));
+      transform: translateY(20px);
+      transition: transform .22s;
+      max-height: 82dvh;
+      overflow-y: auto;
+    }
+    .notif-overlay.show .notif-sheet { transform: translateY(0); }
+    .notif-sheet-handle {
+      width: 36px; height: 4px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 99px;
+      margin: 12px auto 0;
+    }
+    .notif-sheet-hd {
+      font-size: 0.54rem;
+      font-weight: 700;
+      letter-spacing: 0.38em;
+      text-transform: uppercase;
+      color: var(--gold);
+      text-align: center;
+      padding: 16px 0 4px;
+    }
+    .notif-row {
+      display: flex;
+      align-items: center;
+      padding: 13px 20px;
+      border-bottom: 1px solid var(--border);
+      gap: 10px;
+    }
+    .notif-row:last-of-type { border-bottom: none; }
+    .notif-row-emoji { font-size: 1rem; width: 22px; text-align: center; flex-shrink: 0; }
+    .notif-row-label { flex: 1; font-size: 0.74rem; font-weight: 500; color: var(--cream); }
+    .notif-time-inp {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      color: var(--cream);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 5px 8px;
+      width: 78px;
+      text-align: center;
+      -webkit-appearance: none;
+      color-scheme: dark;
+    }
+    .notif-time-inp:focus { outline: none; border-color: var(--border-g); }
+    .notif-toggle { position: relative; width: 36px; height: 20px; flex-shrink: 0; }
+    .notif-toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+    .ntgl {
+      position: absolute; inset: 0;
+      background: var(--muted);
+      border-radius: 99px;
+      cursor: pointer;
+      transition: background .18s;
+    }
+    .ntgl::before {
+      content: '';
+      position: absolute;
+      width: 14px; height: 14px;
+      left: 3px; top: 3px;
+      background: #fff;
+      border-radius: 50%;
+      transition: transform .18s;
+    }
+    .notif-toggle input:checked + .ntgl { background: var(--gold); }
+    .notif-toggle input:checked + .ntgl::before { transform: translateX(16px); }
+    .notif-save-area { padding: 16px 20px 4px; }
   </style>
 </head>
 <body>
@@ -1644,6 +1781,19 @@
   <!-- ═══ DIARIO / OPS ═══ -->
   <div class="tab-panel" id="tab-ops">
 
+    <div class="sec-label">Alertas</div>
+    <div class="notif-card" id="notifCard">
+      <div class="notif-card-info">
+        <div class="notif-card-title">
+          <span class="notif-dot" id="notifDot"></span>
+          Notificaciones
+        </div>
+        <div class="notif-card-sub" id="notifSub">Cargando…</div>
+      </div>
+      <button class="notif-btn" id="notifPermBtn" style="display:none">Activar</button>
+      <button class="notif-btn" id="notifConfigBtn" style="display:none">Configurar</button>
+    </div>
+
     <div class="sec-label">Progreso del día</div>
     <div class="ops-overview">
       <div class="ops-bar-wrap"><div class="ops-bar" id="opsProgressBar"></div></div>
@@ -1692,6 +1842,18 @@
       <span style="font-size:0.62rem;color:var(--muted)">pzas</span>
     </div>
     <button class="batch-save-btn" id="batchSaveBtn">Guardar</button>
+  </div>
+</div>
+
+<!-- NOTIFICATION CONFIG SHEET -->
+<div class="notif-overlay" id="notifOverlay">
+  <div class="notif-sheet">
+    <div class="notif-sheet-handle"></div>
+    <div class="notif-sheet-hd">Notificaciones</div>
+    <div id="notifItemList"></div>
+    <div class="notif-save-area">
+      <button class="batch-save-btn" id="notifSaveBtn">Guardar</button>
+    </div>
   </div>
 </div>
 
@@ -1814,7 +1976,7 @@ var PAYMENTS = [
 function loadSales() { try { return JSON.parse(localStorage.getItem('ck_sales') || '[]'); } catch(e){ return []; } }
 function loadStock() { try { return JSON.parse(localStorage.getItem('ck_stock') || 'null'); } catch(e){ return null; } }
 function saveSales(d){ localStorage.setItem('ck_sales', JSON.stringify(d)); sbSyncSales(d); }
-function saveStock(d){ localStorage.setItem('ck_stock', JSON.stringify(d)); sbSyncStock(d); }
+function saveStock(d){ checkStockAlerts(d); localStorage.setItem('ck_stock', JSON.stringify(d)); sbSyncStock(d); }
 
 /* ── SUPABASE ──────────────────────────── */
 var _sb = (typeof supabase !== 'undefined')
@@ -1966,7 +2128,7 @@ document.querySelectorAll('.tab-btn').forEach(function(btn){
     if (id === 'historial') renderHistorial();
     if (id === 'stock')     renderStock();
     if (id === 'costos')    renderCostos();
-    if (id === 'ops')       renderChecklist();
+    if (id === 'ops')       { renderChecklist(); renderNotifCard(); }
   });
 });
 
@@ -2335,6 +2497,7 @@ if (todayCount) document.getElementById('undoBtn').disabled = false;
 updateOpsProgress(loadChecklist());
 renderBatchCard();
 sbFetchAndMerge();
+initNotifications();
 
 /* ── STOCK ─────────────────────────────── */
 function renderStock() {
@@ -2715,6 +2878,7 @@ function renderBatchCard() {
     if (!_batchWarnFired) {
       _batchWarnFired = true;
       showToast('⚠ Quedan ' + remaining + ' banderillas');
+      fireNotif('⚠️ Pocas banderillas', 'Quedan ' + remaining + ' — prepara más pronto', 'batch_low');
     }
   } else {
     card.className         = 'batch-card';
@@ -2759,6 +2923,240 @@ document.getElementById('batchSaveBtn').addEventListener('click', function() {
   document.getElementById('batchOverlay').classList.remove('show');
   renderBatchCard();
   showToast(total + ' banderillas registradas');
+});
+
+/* ── NOTIFICACIONES ─────────────────────── */
+var NOTIF_DEFAULTS = [
+  { id: 'n_manana',   hour: 10, min:  0, label: 'Mañana',        section: 'manana',   emoji: '☀️', body: 'Lavar trastes y revisar el sistema' },
+  { id: 'n_limpieza', hour: 17, min:  0, label: 'Limpieza',      section: 'limpieza', emoji: '🧹', body: 'Hora de barrer, trapear y limpiar mesa de acero' },
+  { id: 'n_setup',    hour: 18, min:  0, label: 'Setup',         section: 'setup',    emoji: '🔥', body: 'Encender freidora y preparar mise en place' },
+  { id: 'n_misplace', hour: 18, min: 30, label: 'Mise en Place', section: 'misplace', emoji: '📦', body: 'Masa, papa, asistente, caja togo y charolas' },
+  { id: 'n_abrir',    hour: 19, min:  0, label: 'Abrir',         section: 'abrir',    emoji: '🏪', body: 'Caja, POS, hielera — ¿ya abriste?' },
+  { id: 'n_turno',    hour: 21, min:  0, label: 'Turno',         section: 'turno',    emoji: '⚡', body: '¿Freidora limpia? ¿Letrero puesto?' },
+  { id: 'n_cierre',   hour: 22, min:  0, label: 'Cierre',        section: 'cierre',   emoji: '🔒', body: 'Apagar freidora, meter letrero y lavar trastes' },
+];
+
+function loadNotifConfig() {
+  try {
+    var saved = JSON.parse(localStorage.getItem('ck_notif') || '{}');
+    return NOTIF_DEFAULTS.map(function(def) {
+      var ov = saved[def.id] || {};
+      return {
+        id: def.id, label: def.label, section: def.section,
+        emoji: def.emoji, body: def.body,
+        hour:    ov.hour    !== undefined ? ov.hour    : def.hour,
+        min:     ov.min     !== undefined ? ov.min     : def.min,
+        enabled: ov.enabled !== undefined ? ov.enabled : true,
+      };
+    });
+  } catch(e) {
+    return NOTIF_DEFAULTS.map(function(d) { return Object.assign({}, d, { enabled: true }); });
+  }
+}
+
+function saveNotifConfig(arr) {
+  var map = {};
+  arr.forEach(function(item) {
+    map[item.id] = { hour: item.hour, min: item.min, enabled: item.enabled };
+  });
+  localStorage.setItem('ck_notif', JSON.stringify(map));
+}
+
+var _notifTimers = {};
+var _swReady     = false;
+
+function fireNotif(title, body, tag) {
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  var opts = { body: body, tag: tag || 'ck', icon: '/img/logo-icon.jpg', badge: '/img/logo-icon.jpg', vibrate: [200, 100, 200] };
+  if (_swReady && navigator.serviceWorker && navigator.serviceWorker.controller) {
+    navigator.serviceWorker.controller.postMessage({ type: 'SHOW_NOTIFICATION', title: 'Cabo Krunch · ' + title, body: body, tag: tag || 'ck' });
+  } else {
+    try { new Notification('Cabo Krunch · ' + title, opts); } catch(e) {}
+  }
+}
+
+function scheduleNotifications() {
+  Object.keys(_notifTimers).forEach(function(k) { clearTimeout(_notifTimers[k]); });
+  _notifTimers = {};
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+
+  var cfg  = loadNotifConfig();
+  var now  = new Date();
+
+  cfg.forEach(function(n) {
+    if (!n.enabled) return;
+    var target = new Date();
+    target.setHours(n.hour, n.min, 0, 0);
+    var ms = target - now;
+    if (ms <= 0) return;
+
+    _notifTimers[n.id] = setTimeout(function() {
+      var freshData = loadChecklist();
+      var sec = CHECKLIST ? CHECKLIST.find(function(s) { return s.id === n.section; }) : null;
+      if (sec) {
+        var done = sec.items.every(function(item) { return freshData.checks[item.id]; });
+        if (done) return; // sección ya completada
+      }
+      fireNotif(n.emoji + ' ' + n.label, n.body, n.id);
+    }, ms);
+  });
+}
+
+function checkMissedNotifs() {
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  var cfg  = loadNotifConfig();
+  var data = loadChecklist();
+  var now  = new Date();
+
+  cfg.forEach(function(n, idx) {
+    if (!n.enabled) return;
+    var target = new Date();
+    target.setHours(n.hour, n.min, 0, 0);
+    var msPast = now - target;
+    if (msPast < 0 || msPast > 90 * 60 * 1000) return; // solo últimas 1.5h
+
+    var sec = CHECKLIST ? CHECKLIST.find(function(s) { return s.id === n.section; }) : null;
+    if (sec) {
+      var done = sec.items.every(function(item) { return data.checks[item.id]; });
+      if (done) return;
+    }
+    setTimeout(function() {
+      fireNotif(n.emoji + ' ' + n.label + ' (pendiente)', n.body, n.id + '_missed');
+    }, (idx + 1) * 1200);
+  });
+}
+
+function checkStockAlerts(newData) {
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  var old = {};
+  try { var o = JSON.parse(localStorage.getItem('ck_stock') || 'null'); if (o) old = o; } catch(e) {}
+  for (var k in STOCK_DEF) {
+    var def    = STOCK_DEF[k];
+    var oldQty = old[k] !== undefined ? old[k] : 9999;
+    var newQty = newData[k] !== undefined ? newData[k] : 0;
+    var wasOk  = oldQty > def.warn;
+    var isLow  = newQty <= def.low;
+    var isWarn = !isLow && newQty <= def.warn;
+    if      (isLow  && oldQty > def.low)  fireNotif('⚠️ Stock crítico', def.name + ' al mínimo — ' + fmtQty(newQty) + ' ' + def.unit, 'stk_' + k);
+    else if (isWarn && wasOk)             fireNotif('📉 Stock bajo',    def.name + ' — ' + fmtQty(newQty) + ' ' + def.unit,            'stk_w_' + k);
+  }
+}
+
+function initNotifications() {
+  if (!('Notification' in window)) {
+    var card = document.getElementById('notifCard');
+    if (card) card.style.display = 'none';
+    return;
+  }
+
+  // Register service worker
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').then(function() {
+      _swReady = !!navigator.serviceWorker.controller;
+      navigator.serviceWorker.addEventListener('controllerchange', function() { _swReady = true; });
+    }).catch(function() {});
+  }
+
+  var perm = Notification.permission;
+  if (perm === 'granted') {
+    scheduleNotifications();
+    setTimeout(checkMissedNotifs, 2500);
+  }
+  renderNotifCard();
+}
+
+function renderNotifCard() {
+  var dot    = document.getElementById('notifDot');
+  var sub    = document.getElementById('notifSub');
+  var permBt = document.getElementById('notifPermBtn');
+  var cfgBt  = document.getElementById('notifConfigBtn');
+  if (!dot) return;
+
+  if (!('Notification' in window)) return;
+  var perm = Notification.permission;
+
+  if (perm === 'granted') {
+    var cfg    = loadNotifConfig();
+    var active = cfg.filter(function(n) { return n.enabled; }).length;
+    dot.className              = 'notif-dot on';
+    sub.textContent            = active + ' alertas activas';
+    permBt.style.display       = 'none';
+    cfgBt.style.display        = '';
+  } else if (perm === 'default') {
+    dot.className              = 'notif-dot';
+    sub.textContent            = 'Toca Activar para recibir recordatorios';
+    permBt.style.display       = '';
+    cfgBt.style.display        = 'none';
+  } else {
+    dot.className              = 'notif-dot';
+    sub.textContent            = 'Bloqueadas — actívalas en ajustes del navegador';
+    permBt.style.display       = 'none';
+    cfgBt.style.display        = 'none';
+  }
+}
+
+function openNotifConfig() {
+  var cfg  = loadNotifConfig();
+  var list = document.getElementById('notifItemList');
+  list.innerHTML = '';
+
+  cfg.forEach(function(n) {
+    var hh = String(n.hour).padStart(2, '0');
+    var mm = String(n.min).padStart(2, '0');
+    var row = document.createElement('div');
+    row.className = 'notif-row';
+    row.innerHTML =
+      '<span class="notif-row-emoji">' + n.emoji + '</span>' +
+      '<span class="notif-row-label">' + n.label + '</span>' +
+      '<input class="notif-time-inp" type="time" data-id="' + n.id + '" value="' + hh + ':' + mm + '">' +
+      '<label class="notif-toggle">' +
+        '<input type="checkbox" data-id="' + n.id + '"' + (n.enabled ? ' checked' : '') + '>' +
+        '<span class="ntgl"></span>' +
+      '</label>';
+    list.appendChild(row);
+  });
+
+  document.getElementById('notifOverlay').classList.add('show');
+}
+
+document.getElementById('notifPermBtn').addEventListener('click', function() {
+  Notification.requestPermission().then(function(result) {
+    if (result === 'granted') {
+      scheduleNotifications();
+      setTimeout(checkMissedNotifs, 1000);
+      showToast('✓ Notificaciones activadas');
+    } else {
+      showToast('Notificaciones bloqueadas en el navegador');
+    }
+    renderNotifCard();
+  });
+});
+
+document.getElementById('notifConfigBtn').addEventListener('click', openNotifConfig);
+
+document.getElementById('notifOverlay').addEventListener('click', function(e) {
+  if (e.target === this) this.classList.remove('show');
+});
+
+document.getElementById('notifSaveBtn').addEventListener('click', function() {
+  var cfg = loadNotifConfig();
+  document.querySelectorAll('#notifItemList .notif-row').forEach(function(row) {
+    var timeInp   = row.querySelector('.notif-time-inp');
+    var toggleInp = row.querySelector('.notif-toggle input');
+    var id        = timeInp.dataset.id;
+    var item      = cfg.find(function(n) { return n.id === id; });
+    if (!item) return;
+    var parts  = (timeInp.value || '').split(':');
+    item.hour    = parseInt(parts[0], 10) || 0;
+    item.min     = parseInt(parts[1], 10) || 0;
+    item.enabled = toggleInp.checked;
+  });
+  saveNotifConfig(cfg);
+  scheduleNotifications();
+  document.getElementById('notifOverlay').classList.remove('show');
+  renderNotifCard();
+  var active = cfg.filter(function(n) { return n.enabled; }).length;
+  showToast('Guardado · ' + active + ' alertas activas');
 });
 
 /* ── CHECKLIST / DIARIO ────────────────── */
@@ -3141,6 +3539,13 @@ if (isKiosk) {
 }());
 
 }());
+
+/* ── SERVICE WORKER REGISTRATION ──────── */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/sw.js').catch(function() {});
+  });
+}
 </script>
 </body>
 </html>

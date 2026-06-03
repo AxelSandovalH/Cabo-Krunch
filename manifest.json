@@ -1,0 +1,19 @@
+{
+  "name": "Cabo Krunch POS",
+  "short_name": "Cabo Krunch",
+  "description": "Punto de venta — Cabo Krunch",
+  "start_url": "/sistema.html",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#070707",
+  "theme_color": "#070707",
+  "icons": [
+    {
+      "src": "/img/logo-icon.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "any"
+    }
+  ]
+}
